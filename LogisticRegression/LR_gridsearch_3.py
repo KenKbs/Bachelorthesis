@@ -10,69 +10,18 @@ Created on Thu Jan 25 13:26:34 2024
 import pandas as pd
 
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
-
-from sklearn.metrics import make_scorer,accuracy_score, balanced_accuracy_score, f1_score, precision_score, recall_score
-
+from sklearn.metrics import make_scorer,accuracy_score, balanced_accuracy_score, f1_score, precision_score, recall_score, confusion_matrix
 from sklearn.linear_model import LogisticRegression
 
 from LR_version_2 import get_data
 from LR_version_2 import filter_data
 from LR_version_2 import train_test_split_data
 from LR_version_2 import evaluate_model_performance
+from LR_version_2 import generate_table
+
 
 
 #%% functions
-
-def generate_combinations_dict(lists_to_generate=10):
-    """
-    Generate combinations of weights and convert them to dictionaries.
-    Can be passed to Grid-search
-
-    Parameters
-    ----------
-    lists_to_generate : int, optional
-        The number of random weight sets to generate and include in the combinations. 
-        The default is 10.
-
-    Returns
-    -------
-    combinations : list of dict
-        A list containing dictionaries representing combinations of weights.
-        Each dictionary has keys representing the faults (0-4) and values
-        representing the corresponding weight in the permutation.
-
-
-    """
-    #Imports 
-    from itertools import permutations
-    import random
-    
-    # Predefined weight sets
-    weight_sets = [
-        [2,1,1,1,1],
-        [2,2,1,1,1],
-        [2,2,2,1,1]
-        # [1, 2, 3, 4, 5],
-        # [100,10,10,10,10],
-        # [100,100,10,10,10],    
-    ]
-    
-    # Generate and append random weight sets to weight_sets
-    for _ in range(lists_to_generate):
-        random_list=[random.uniform(1,10) for _ in range(5)] 
-        weight_sets.append(random_list)
-        
-    
-    combinations = []
-
-    #Generate permuatations and convert them to dictonaries
-    for weights in weight_sets:
-        permutations_list = list(permutations(weights))
-        for perm_tuple in permutations_list:
-            combination_dict = {i: perm_tuple[i] for i in range(len(perm_tuple))}
-            combinations.append(combination_dict)
-
-    return combinations
 
 
 def extract_class_weights (dataframe):
@@ -197,6 +146,129 @@ def write_output_to_csv(dataframe,subdirectory=None,file_name="results.csv",stri
     if isinstance(string_to_write, str):
         with open(file_path,'a') as file:
             file.write(string_to_write)
+            
+    
+def plot_confusion_matrix(cm,
+                          target_names=None,
+                          to_file=False,
+                          title='Confusion matrix',
+                          cmap=None,
+                          normalize=True):
+    """
+    given a sklearn confusion matrix (cm), make a nice plot
+
+    Arguments
+    ---------
+    cm:           confusion matrix from sklearn.metrics.confusion_matrix
+
+    target_names: given classification classes such as [0, 1, 2]
+                  the class names, for example: ['high', 'medium', 'low']
+
+    to_file:      Bool, String
+                  If True, save plot to results folder. If string
+                  is given, save to subdirectory of results
+                  OPTIONAL Default = False
+
+    title:        the text to display at the top of the matrix
+
+    cmap:         the gradient of the values displayed from matplotlib.pyplot.cm
+                  see http://matplotlib.org/examples/color/colormaps_reference.html
+                  plt.get_cmap('jet') or plt.cm.Blues
+
+    normalize:    If False, plot the raw numbers
+                  If True, plot the proportions
+
+    Usage
+    -----
+    plot_confusion_matrix(cm           = cm,                  # confusion matrix created by
+                                                              # sklearn.metrics.confusion_matrix
+                          normalize    = True,                # show proportions
+                          target_names = y_labels_vals,       # list of names of the classes
+                          title        = best_estimator_name) # title of graph
+
+    Citiation
+    ---------
+    http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
+
+    """
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import itertools
+    import os
+
+    accuracy = np.trace(cm) / np.sum(cm).astype('float')
+    misclass = 1 - accuracy
+
+    if cmap is None:
+        cmap = plt.get_cmap('Blues')
+
+    plt.figure(figsize=(8, 6))
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+
+    if target_names is not None:
+        tick_marks = np.arange(len(target_names))
+        plt.xticks(tick_marks, target_names, rotation=45)
+        plt.yticks(tick_marks, target_names)
+
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+
+
+    #plot values into Matrix
+    thresh = cm.max() / 1.00 if normalize else cm.max() / 2 #thres first = 1.5 orginally, disable white drawing for normalized, because high class imbalance!
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        if normalize:
+            plt.text(j, i, "{:0.4f}".format(cm[i, j]),
+                     horizontalalignment="center",
+                     color="white" if cm[i, j] > thresh else "black")
+        else:
+            plt.text(j, i, "{:,}".format(cm[i, j]),
+                     horizontalalignment="center",
+                     color="white" if cm[i, j] > thresh else "black")
+
+    #Adjust axis
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label\naccuracy={:0.4f}; misclass={:0.4f}'.format(accuracy, misclass))
+    
+    #get current figure for saving to filepath later
+    fig=plt.gcf() 
+    
+    #show the plot
+    plt.show() 
+       
+    #save plot to directory
+    if isinstance(to_file,str) or to_file:
+        # fig.subplots_adjust(bottom=2) #adjust cutoff value for bottom
+        try:
+            #Attempt to get path of current script (does not work when not running whole file)
+            script_path = os.path.dirname(os.path.realpath(__file__))
+        
+        except NameError:
+            #handle the case where '__file__' is not defined, hard code directory
+            script_path = r"C:\Users\Kenny\Dropbox\Education\Uni\FU-Berlin\Inhalte\9. Semester\Bachelorarbeit\Programmierung\GitHub-Repo\LogisticRegression"
+        
+        # Move up one directory and navigate into Results-path
+        parent_directory = os.path.abspath(os.path.join(script_path, os.pardir))
+        results_directory = os.path.join(parent_directory,"Results")
+        
+        #if to_file = string deal with that as it is a subdirectory
+        if isinstance(to_file,str):
+            try:
+                results_directory= os.path.join(results_directory,to_file)
+                if os.path.exists(results_directory):
+                    pass
+                else:
+                    raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
+            except ValueError as e:
+                print(f'ValueError: {e}')
+                os.makedirs(results_directory) #Create subdirectory if it does not exist    
+      
+        file_path=os.path.join(results_directory,f'{title}.pdf')
+        fig.savefig(file_path,format="pdf",bbox_inches='tight',pad_inches=0.1) #bbox_inches for not cutting off labels!
+    
     
 
 #%% main function
@@ -204,26 +276,29 @@ def write_output_to_csv(dataframe,subdirectory=None,file_name="results.csv",stri
 def perform_grid_search(): 
     # read-in data
     data=get_data()
+    data_before_filter=data
     
     # Filter out low irrediance values
     data=filter_data(data=data,filter_value=100) 
     
+    #Print fault distribution before and after cutoff
+    generate_table(data_before_filter,data,data1_name="raw",data2_name="filtered")
+    
     # split data into train/test sample w. own function, scaling = True 
     x_train, x_test, y_train, y_test = train_test_split_data(data=data,
                                                              test_size=0.2,scaling=True)
-                                                             
-    
+                                                                 
     # Define logistic Regression Object
     logreg=LogisticRegression(multi_class="multinomial",solver="newton-cg",
-                                    max_iter=500,penalty='l2',C=1.0) #C=, class_weights="balanced", "none"
+                                    max_iter=500,penalty='l2',C=1.0,class_weight=None) #C=, class_weights="balanced", "none"
+    """
+    only solver='lbfgs' also estimates "real" multinomial model, but newton-cg better convergence
+    altough it's a little slower l1 penalty not possible with newton-cg
+    would need to use saga solver.
+    """
+    
     
     #%% Set Parameters to search for in Grid_search
-    
-    #Set Class weights
-    class_weights = generate_combinations_dict(0) #currently 0 random weights, because already enough
-    class_weights.append({0:1,1:1,2:1,3:1,4:1}) #no weights
-    class_weights.append('balanced') #balanced
-    #class_weights_t=['balanced',{0:1,1:1,2:1,3:1,4:1}] # for testing purposes
     
     #Set penalization parameter
     # penalization_param=np.logspace(-3,3,7) # penalization parameter
@@ -231,11 +306,9 @@ def perform_grid_search():
     
     
     #Give over Parameters to parameter grid
-    param_grid={
-        'class_weight':class_weights,
-        'C':penalization_param 
-         }
-    
+    param_grid={'C':penalization_param}
+
+
     #%% Set Parameters for Grid-search
     # Define scoring metrics (for tracking and refit purposes)   
     scoring_metric={'accuracy':make_scorer(accuracy_score), 
@@ -268,49 +341,59 @@ def perform_grid_search():
     # Fit the grid search to the data
     grid_search.fit(x_train,y_train)
     
-    # Get the best parameters and corresponding model
-    best_params = grid_search.best_params_
+    # Get the best model
     best_model = grid_search.best_estimator_
     
     
     #%% Test, evaluate and print out results
     
-    # Test best model on 20% test-Split    
+    # Make predictions on 20% test set  
     y_pred_best = best_model.predict(x_test)
     
     # Evaluate Best Model on test set.
     accuracy_best,report_best=evaluate_model_performance(y_test=y_test, y_pred=y_pred_best,model="Best-model Grid-search") 
     
-    # Define new list for output
-    csv_output=[]
+    # Define new list for output, convert later to string for output
+    csv_output=["\n"]
     
     # Get model parameters
     csv_output.append("Model Parameters:")
     csv_output.append(best_model.get_params())
+    csv_output.append("") #for one empty line
     
     # Get coefficients of model
+    csv_output.append("Coefficients of Model for each class")
     for i, class_coefficients in enumerate(best_model.coef_):
         csv_output.append(f"Coefficients for Class {i}: {class_coefficients}")
+    csv_output.append("\n")
     
     # Append performance on test set to output
+    csv_output.append("performance_metrics on test-set")
     csv_output.append(report_best)
+    csv_output.append("")
     
-    # Extract the results of Grid-search into a DataFrame
-    results_df = pd.DataFrame(grid_search.cv_results_)
-    
-    #Append class_weights to DataFrame
-    results_df=extract_class_weights(results_df)
-    
-    #Convert list output to one string
+    # Create confusion Matrix and append it to output:
+    cm=confusion_matrix(y_test, y_pred_best)
+    csv_output.append('Confusion Matrix:')
+    csv_output.append(cm)
+    csv_output.append("\n")
+        
+    #Convert csv_output list to one string
     string_to_write=""
     for entry in csv_output:
         string_to_write+="\n"
         string_to_write+=str(entry)
     
+    # Extract the results of Grid-search into a DataFrame
+    results_df = pd.DataFrame(grid_search.cv_results_)
+       
     #Write Dataframe and string to csv
-    write_output_to_csv(results_df,subdirectory="LR",file_name="LR-Grid-search - first three class_weights_balanced_none.csv",string_to_write=string_to_write)
+    write_output_to_csv(results_df,subdirectory="LR",file_name="only l2 c.csv",string_to_write=string_to_write)
 
-
+    #Create Plot of confusion matrix and save it to subdirectory LR in results directory       
+    plot_confusion_matrix(cm,target_names=['Normal','shortc','degred','openc','shadw'],
+                          normalize=True, to_file="LR")
+  
 
 #%% run script
 if __name__ == '__main__':
