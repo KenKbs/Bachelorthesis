@@ -1,28 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jan 11 16:54:25 2024
+Created on Thu Jan 25 16:23:48 2024
 
 @author: Kenny
 """
 
-#%% imports
-
+#%% imports --> moved to main
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt # for Histogram
-import seaborn as sns # for Heatmap
-
-# from sklearn.model_selection import train_test_split
-# from sklearn.metrics import accuracy_score, classification_report
-# from sklearn.preprocessing import StandardScaler
-
-from sklearn.linear_model import LogisticRegression
-import statsmodels.api as sm
 
 
-#clear all variables
-from IPython import get_ipython
-get_ipython().magic('reset -sf')
+
+
 
 
 #%% Functions
@@ -165,6 +155,8 @@ def generate_table(data1, data2=None,data1_name='data1',data2_name='data2'):
         printed out table.
 
     """
+    category_labels = ['0 = Normal Operation', "1 = Short Circuit","2 = Degredation",
+                        '3 = Open Circuit', '4 = Shadowing'] # locally assigning again
     
     # Checks whetver input is a series or DF, if series, convert to DF
     if isinstance(data1, pd.Series):
@@ -292,7 +284,8 @@ def evaluate_model_performance (y_test,y_pred,model="model",
         
         elif not_include_results: #not_include_results = True
             return None
-  
+    
+
 
 def filter_data (data,filter_value=0):
     """
@@ -360,9 +353,9 @@ def train_test_split_data (data,test_size=0.20,scaling=False,random_state=None):
     Returns
     -------
     x_train : Array
-    x_test : TYPE
-    y_train : List
-    y_test : List
+    x_test : Series
+    y_train : Array
+    y_test : Series
 
 
     """
@@ -394,261 +387,242 @@ def train_test_split_data (data,test_size=0.20,scaling=False,random_state=None):
 
 #%% Main Function
 def main():
-    pass
     
-
-#%% Read in raw_data and first look on raw Data
-raw_data=get_data()
-
-# raw_data=raw_data.sort_values(by=['f_nv','irr'],ascending=True) #sort by error and irrediance
-raw_data_summary=get_summarystats(raw_data)
-
-# Plot fault distribution for Raw-data
-plot_histogram(raw_data,'Raw-data').show() 
-
-
-#%% Filter out data with low irradiance
-
-# Filter data
-data=filter_data(raw_data,filter_value=200)
-
-# Get summary stats
-data_summary=get_summarystats(data)
-
-# Plot fault distribution for filtered data
-plot_histogram(data, "manipulated data") 
-
-# Create Table showing fault distribution
-generate_table(raw_data,data2=data,data1_name="raw_data",data2_name="manip.data")
-
-
-#%% Data preparance for Logistic Regression
-
-x_train, x_test, y_train, y_test = train_test_split_data(data,test_size=0.20,
-                                                         scaling=False,
-                                                         random_state=42)
-
-# #Split dataset into 80/20% and then perform a grid search with k-fold validation on the 80% with a grid search
-# X=data.drop('f_nv',axis=1) # Create X Matrix
-# Y=data['f_nv'] # Create Y-Vector
-# test_size=0.20 # Set Test-sample size
-
-# # Split Test, Train set
-# x_train, x_test, y_train, y_test=train_test_split(X,Y,test_size=test_size, #put random state out later
-#                                                   random_state=42,stratify=Y) #Test,train split, Stratify by Y Vector because of imbalance of classes
-
-# # Convert Float to int to get clear classes
-# y_train = y_train.astype(int) 
-
-# look at fault distribution of train/test data --> Stratisfying works
-generate_table(y_train,y_test,data1_name='y_train',data2_name='y-test') 
-
-
-#%% Logistic Regression Statmodels
-
-# Plot correlation matrix
-correlation_matrix=data.corr() #Drop idc1, because high correlation!!! And faults only introduced in 2
-sns.heatmap(correlation_matrix,annot=True,cmap='coolwarm') # Draw correlation heatmap
-plt.title('Heatmap for correlation of data')
-plt.show 
-
-# Pepare Data: add constant + drop idc1
-x_train_sm = sm.add_constant(x_train) # Add constant
-x_test_sm = sm.add_constant(x_test)
-x_train_sm = x_train.drop('idc1',axis=1) #Could also drop vdc1
-x_test_sm = x_test.drop('idc1',axis=1) # dropping idc1, because if no variable dropped, no clear results!
-
-#declare y- test and train set for sm-regression
-y_train_sm=y_train
-y_test_sm=y_test
-
-# Fit multinomial regression model
-logit_model = sm.MNLogit(y_train_sm, x_train_sm)
-result = logit_model.fit()
-
-# Display summary of the model
-stats1=result.summary()
-stats2=result.summary2()
-print(stats1)
-print(stats2)
-
-# Test model
-y_pred_probs = result.predict(x_test_sm)
-y_pred_sm = np.argmax(y_pred_probs.values, axis=1)
-
-accuracy_overview={} #Create dictonary to compare accuracy scores of models
-
-# Evaluate Model
-accuracy_sm,report_sm,accuracy_overview=evaluate_model_performance(y_test_sm, y_pred_sm,
-                                                                   model="StatsmodelSm",shortend=True,
-                                                                   not_include_results=False,
-                                                                   append_dict=accuracy_overview) 
-
-
-#%% Logistic Regression OVR using SKLearn
-
-#Define Logistic Regression Object
-logreg_ovr = LogisticRegression(multi_class="ovr",solver="lbfgs",
-                                max_iter=1000,penalty=None)                                
-
-# Train model
-logreg_ovr.fit(x_train,y_train) 
-
-# Test model
-y_pred_ovr = logreg_ovr.predict(x_test)
-
-# Evaluate model: 
-accuracy_OVR,report_OVR,accuracy_overview=evaluate_model_performance(y_test, y_pred_ovr,
-                                                                   model="SKLearnOVR",shortend=True,
-                                                                   not_include_results=False,
-                                                                   append_dict=accuracy_overview)     
-
-# Print the model parameters
-print("Model Parameters:")
-print(logreg_ovr.get_params())
-
-# Print other model information
-print("Model Information:")
-print(logreg_ovr)
-
-for i, class_coefficients in enumerate(logreg_ovr.coef_):
-    print(f"Coefficients for Class {i}: {class_coefficients}")
-
-
-
-#%% Logistic Regression MN with SKlearn and penalization term (l2)
-
-#Define Logistic Regression Object
-logreg_skmn = LogisticRegression(multi_class="multinomial",solver="newton-cg",
-                                max_iter=1000,penalty='l2',C=1.0)                            
-
-# Train model
-logreg_skmn.fit(x_train,y_train) 
-
-# Test model
-y_pred_skmn = logreg_skmn.predict(x_test)
-
-
-#Evaluate Model
-accuracy_SKMN,report_SKMN,accuracy_overview=evaluate_model_performance(y_test, y_pred_skmn,
-                                                                   model="SKLearnMN w.l2 ",shortend=True,
-                                                                   not_include_results=False,
-                                                                   append_dict=accuracy_overview) 
-
-# Print the model parameters
-print("Model Parameters:")
-print(logreg_skmn.get_params())
-
-# Print other model information
-print("Model Information:")
-print(logreg_skmn)
-
-for i, class_coefficients in enumerate(logreg_skmn.coef_):
-    print(f"Coefficients for Class {i}: {class_coefficients}")
-
-
-
-#%% Multinomial logistic regression WITH Normalized data
-
-x_train_scaled, x_test_scaled, y_train_scaled, y_test_scaled = train_test_split_data(data,
-                                                                                     test_size=0.20,
-                                                                                     scaling=True,
-                                                                                     random_state=42)
-
-
-#%% OVR again: 
-
-# Initiate Model    
-logreg_ovr_scaled = LogisticRegression(multi_class="ovr",solver="lbfgs",
-                                max_iter=500,penalty=None)   
-
-# Train model
-logreg_ovr_scaled.fit(x_train_scaled,y_train_scaled) 
-
-# Test model
-y_pred_ovr_scaled = logreg_ovr_scaled.predict(x_test_scaled)
-
-# Evaluate Model
-accuracy_OVR_scaled,report_OVR_scaled,accuracy_overview=evaluate_model_performance(y_test_scaled, y_pred_ovr_scaled,
-                                                                   model="SKLearnOVR - SCALED",shortend=True,
-                                                                   not_include_results=False,
-                                                                   append_dict=accuracy_overview) 
-
-# Print the model parameters
-print("Model Parameters:")
-print(logreg_ovr_scaled.get_params())
-
-# Print other model information
-print("Model Information:")
-print(logreg_ovr_scaled)
-
-for i, class_coefficients in enumerate(logreg_ovr_scaled.coef_):
-    print(f"Coefficients for Class {i}: {class_coefficients}")
-
-
-#%% Multinomial again with l2 penalization:
-
-#Define Logistic Regression Object
-logreg_skmn_scaled = LogisticRegression(multi_class="multinomial",solver="newton-cg",
-                                max_iter=500,penalty='l2',C=1.0)                            
-
-# Train model
-logreg_skmn_scaled.fit(x_train_scaled,y_train_scaled) 
-
-# Test model
-y_pred_skmn_scaled = logreg_skmn_scaled.predict(x_test_scaled)
-
-# Evaluate Model
-accuracy_SKMN_Scaled,report_SKMN_Scaled,accuracy_overview=evaluate_model_performance(y_test_scaled, y_pred_skmn_scaled,
-                                                                   model="SKLearnMN w.l2 - SCALED",shortend=True,
-                                                                   not_include_results=False,
-                                                                   append_dict=accuracy_overview) 
-
-# Print the model parameters
-print("Model Parameters:")
-print(logreg_skmn_scaled.get_params())
-
-# Print other model information
-print("Model Information:")
-print(logreg_skmn_scaled)
-
-for i, class_coefficients in enumerate(logreg_skmn_scaled.coef_):
-    print(f"Coefficients for Class {i}: {class_coefficients}")
-
+    from sklearn.linear_model import LogisticRegression
+    import statsmodels.api as sm
+    import seaborn as sns # for Heatmap
     
+    #%% clear all variables
+
+    from IPython import get_ipython
+    get_ipython().magic('reset -sf')
 
 
-
-#%%ToDo 
-"""
-- --> Do a z-Transformation on Data to normalize, no robust stratisfying needed imo. cause no real outliers - DONE
-- Split again into train / test sample also using stratisfying
-- Run a multinomial Regression again with maxiteratins = 1000 
-- Solver should be lbfgs, because a little faster; newton-cg takes FOREVER!
-- accuracy currently around 84%, with sm model still best because predicts all classes! 
-- problem of OVR not predicting 2 probably might be solved using class weights! 
-- See macro_avg Accuracy and not weighted - huge difference!!!
-- implement Grid search with k-fold cross validation for 
-     - penalizing parameter (c)
-     - class weights --> see evernote notes for concept
-
-"""
-
-
-#%% add. notes etc.
-
-#Quality of life improvements:
-"""
-- Write a function for performance evaluation of model
-- Update dictonary, that is given! only updates in function, does not return it globally!
-- just call function every time and not write it every time in hard code DONE
+    #%% Read in raw_data and first look on raw Data
+    raw_data=get_data()
     
-"""
+    # raw_data=raw_data.sort_values(by=['f_nv','irr'],ascending=True) #sort by error and irrediance
+    raw_data_summary=get_summarystats(raw_data)
+    
+    # Plot fault distribution for Raw-data
+    plot_histogram(raw_data,'Raw-data').show() 
+    
+    
+    #%% Filter out data with low irradiance
+    
+    # Filter data
+    data=filter_data(raw_data,filter_value=200)
+    
+    # Get summary stats
+    data_summary=get_summarystats(data)
+    
+    # Plot fault distribution for filtered data
+    plot_histogram(data, "manipulated data") 
+    
+    # Create Table showing fault distribution
+    generate_table(raw_data,data2=data,data1_name="raw_data",data2_name="manip.data")
+    
+    
+    #%% Data preparance for Logistic Regression
+    
+    x_train, x_test, y_train, y_test = train_test_split_data(data,test_size=0.20,
+                                                             scaling=False,
+                                                             random_state=42)
+    
+    # #Split dataset into 80/20% and then perform a grid search with k-fold validation on the 80% with a grid search
+    # X=data.drop('f_nv',axis=1) # Create X Matrix
+    # Y=data['f_nv'] # Create Y-Vector
+    # test_size=0.20 # Set Test-sample size
+    
+    # # Split Test, Train set
+    # x_train, x_test, y_train, y_test=train_test_split(X,Y,test_size=test_size, #put random state out later
+    #                                                   random_state=42,stratify=Y) #Test,train split, Stratify by Y Vector because of imbalance of classes
+    
+    # # Convert Float to int to get clear classes
+    # y_train = y_train.astype(int) 
+    
+    # look at fault distribution of train/test data --> Stratisfying works
+    generate_table(y_train,y_test,data1_name='y_train',data2_name='y-test') 
+    
+    
+    #%% Logistic Regression Statmodels
+    
+    # Plot correlation matrix
+    correlation_matrix=data.corr() #Drop idc1, because high correlation!!! And faults only introduced in 2
+    sns.heatmap(correlation_matrix,annot=True,cmap='coolwarm') # Draw correlation heatmap
+    plt.title('Heatmap for correlation of data')
+    plt.show 
+    
+    # Pepare Data: add constant + drop idc1
+    x_train_sm = sm.add_constant(x_train) # Add constant
+    x_test_sm = sm.add_constant(x_test)
+    x_train_sm = x_train.drop('idc1',axis=1) #Could also drop vdc1
+    x_test_sm = x_test.drop('idc1',axis=1) # dropping idc1, because if no variable dropped, no clear results!
+    
+    #declare y- test and train set for sm-regression
+    y_train_sm=y_train
+    y_test_sm=y_test
+    
+    # Fit multinomial regression model
+    logit_model = sm.MNLogit(y_train_sm, x_train_sm)
+    result = logit_model.fit()
+    
+    # Display summary of the model
+    stats1=result.summary()
+    stats2=result.summary2()
+    print(stats1)
+    print(stats2)
+    
+    # Test model
+    y_pred_probs = result.predict(x_test_sm)
+    y_pred_sm = np.argmax(y_pred_probs.values, axis=1)
+    
+    accuracy_overview={} #Create dictonary to compare accuracy scores of models
+    
+    # Evaluate Model
+    accuracy_sm,report_sm,accuracy_overview=evaluate_model_performance(y_test_sm, y_pred_sm,
+                                                                       model="StatsmodelSm",shortend=True,
+                                                                       not_include_results=False,
+                                                                       append_dict=accuracy_overview) 
+    
+    
+    #%% Logistic Regression OVR using SKLearn
+    
+    #Define Logistic Regression Object
+    logreg_ovr = LogisticRegression(multi_class="ovr",solver="lbfgs",
+                                    max_iter=1000,penalty=None)                                
+    
+    # Train model
+    logreg_ovr.fit(x_train,y_train) 
+    
+    # Test model
+    y_pred_ovr = logreg_ovr.predict(x_test)
+    
+    # Evaluate model: 
+    accuracy_OVR,report_OVR,accuracy_overview=evaluate_model_performance(y_test, y_pred_ovr,
+                                                                       model="SKLearnOVR",shortend=True,
+                                                                       not_include_results=False,
+                                                                       append_dict=accuracy_overview)     
+    
+    # Print the model parameters
+    print("Model Parameters:")
+    print(logreg_ovr.get_params())
+    
+    # Print other model information
+    print("Model Information:")
+    print(logreg_ovr)
+    
+    for i, class_coefficients in enumerate(logreg_ovr.coef_):
+        print(f"Coefficients for Class {i}: {class_coefficients}")
+    
+    
+    
+    #%% Logistic Regression MN with SKlearn and penalization term (l2)
+    
+    #Define Logistic Regression Object
+    logreg_skmn = LogisticRegression(multi_class="multinomial",solver="newton-cg",
+                                    max_iter=1000,penalty='l2',C=1.0)                            
+    
+    # Train model
+    logreg_skmn.fit(x_train,y_train) 
+    
+    # Test model
+    y_pred_skmn = logreg_skmn.predict(x_test)
+    
+    
+    #Evaluate Model
+    accuracy_SKMN,report_SKMN,accuracy_overview=evaluate_model_performance(y_test, y_pred_skmn,
+                                                                       model="SKLearnMN w.l2 ",shortend=True,
+                                                                       not_include_results=False,
+                                                                       append_dict=accuracy_overview) 
+    
+    # Print the model parameters
+    print("Model Parameters:")
+    print(logreg_skmn.get_params())
+    
+    # Print other model information
+    print("Model Information:")
+    print(logreg_skmn)
+    
+    for i, class_coefficients in enumerate(logreg_skmn.coef_):
+        print(f"Coefficients for Class {i}: {class_coefficients}")
+    
+    
+    
+    #%% Multinomial logistic regression WITH Normalized data
+    
+    x_train_scaled, x_test_scaled, y_train_scaled, y_test_scaled = train_test_split_data(data,
+                                                                                         test_size=0.20,
+                                                                                         scaling=True,
+                                                                                         random_state=42)
+    
+    
+    #%% OVR again: 
+    
+    # Initiate Model    
+    logreg_ovr_scaled = LogisticRegression(multi_class="ovr",solver="lbfgs",
+                                    max_iter=500,penalty=None)   
+    
+    # Train model
+    logreg_ovr_scaled.fit(x_train_scaled,y_train_scaled) 
+    
+    # Test model
+    y_pred_ovr_scaled = logreg_ovr_scaled.predict(x_test_scaled)
+    
+    # Evaluate Model
+    accuracy_OVR_scaled,report_OVR_scaled,accuracy_overview=evaluate_model_performance(y_test_scaled, y_pred_ovr_scaled,
+                                                                       model="SKLearnOVR - SCALED",shortend=True,
+                                                                       not_include_results=False,
+                                                                       append_dict=accuracy_overview) 
+    
+    # Print the model parameters
+    print("Model Parameters:")
+    print(logreg_ovr_scaled.get_params())
+    
+    # Print other model information
+    print("Model Information:")
+    print(logreg_ovr_scaled)
+    
+    for i, class_coefficients in enumerate(logreg_ovr_scaled.coef_):
+        print(f"Coefficients for Class {i}: {class_coefficients}")
+    
+    
+    #%% Multinomial again with l2 penalization:
+    
+    #Define Logistic Regression Object
+    logreg_skmn_scaled = LogisticRegression(multi_class="multinomial",solver="newton-cg",
+                                    max_iter=500,penalty='l2',C=1.0)                            
+    
+    # Train model
+    logreg_skmn_scaled.fit(x_train_scaled,y_train_scaled) 
+    
+    # Test model
+    y_pred_skmn_scaled = logreg_skmn_scaled.predict(x_test_scaled)
+    
+    # Evaluate Model
+    accuracy_SKMN_Scaled,report_SKMN_Scaled,accuracy_overview=evaluate_model_performance(y_test_scaled, y_pred_skmn_scaled,
+                                                                       model="SKLearnMN w.l2 - SCALED",shortend=True,
+                                                                       not_include_results=False,
+                                                                       append_dict=accuracy_overview) 
+    
+    # Print the model parameters
+    print("Model Parameters:")
+    print(logreg_skmn_scaled.get_params())
+    
+    # Print other model information
+    print("Model Information:")
+    print(logreg_skmn_scaled)
+    
+    for i, class_coefficients in enumerate(logreg_skmn_scaled.coef_):
+        print(f"Coefficients for Class {i}: {class_coefficients}")
+    
+        
+
 
 
 #%% run main
-"""    
+   
 if __name__ == '__main__':
     main()
-"""
+
     
