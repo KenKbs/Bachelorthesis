@@ -1,5 +1,5 @@
 #Ignore all directories with name _pycache__
-
 **/__pycache__/
 
+#Ignore Spyproject directory
 **/.spyproject/
