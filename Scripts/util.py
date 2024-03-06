@@ -547,7 +547,7 @@ def load_object_from_file(file_name,file_path=None,to_file=False,shading=None):
 
     """
     #get-Filepath if not explicitly stated
-    if not file_path == None:
+    if file_path == None:
         file_path=get_filepath(model_sd=to_file,shading=shading)
     
     #Include filename to filepath
@@ -661,61 +661,6 @@ def plot_confusion_matrix(cm,
     
     #show the plot
     plt.show() 
-    
-    
-    
-    
-    
-    #save plot to directory
-    # if isinstance(to_file,str) or to_file: #Case handling 1: Want to save to file (String or True)
-    #     # fig.subplots_adjust(bottom=2) #adjust cutoff value for bottom
-    #     try:
-    #         #Attempt to get path of current script (does not work when not running whole file)
-    #         script_path = os.path.dirname(os.path.realpath(__file__))
-        
-    #     except NameError:
-    #         #handle the case where '__file__' is not defined, hard code directory
-    #         script_path = r"C:\Users\Kenny\Dropbox\Education\Uni\FU-Berlin\Inhalte\9. Semester\Bachelorarbeit\Programmierung\GitHub-Repo\Bachelorthesis\Scripts"
-        
-    #     # Move up one directory and Navigate into Results-path
-    #     parent_directory = os.path.abspath(os.path.join(script_path,os.pardir))
-    #     results_directory = os.path.join(parent_directory,"Results")
-        
-    #     #Case Handling 2: to_file = string deal with that as it is a subdirectory
-    #     if isinstance(to_file,str):
-    #         try:
-    #             results_directory= os.path.join(results_directory,to_file)
-    #             if os.path.exists(results_directory):
-    #                 pass
-    #             else:
-    #                 raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
-    #         except ValueError as e: #Error handling, if Subdirectory not exists
-    #             print(f'ValueError: {e}')
-    #             os.makedirs(results_directory) #Create subdirectory if it does not exist    
-           
-    #         #Case Handling 3: Shading = True -- Shading included, save to sd "Shading"
-    #         if shading:
-    #             try:
-    #                 results_directory= os.path.join(results_directory,"Shading")
-    #                 if os.path.exists(results_directory):
-    #                     pass
-    #                 else: #Error handling, if Subdirectory not exists
-    #                     raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
-    #             except ValueError as e: 
-    #                 print(f'ValueError: {e}')
-    #                 os.makedirs(results_directory) #Create subdirectory if it does not exist    
-            
-    #         #Case Handling 4: Shading = False, save to sd "woShading"
-    #         elif not shading:
-    #             try:
-    #                 results_directory= os.path.join(results_directory,"woShading")
-    #                 if os.path.exists(results_directory):
-    #                     pass
-    #                 else: #Error handling, if Subdirectory not exists
-    #                     raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
-    #             except ValueError as e: 
-    #                 print(f'ValueError: {e}')
-    #                 os.makedirs(results_directory) #Create subdirectory if it does not exist    
     
     #if filepath = str
     if isinstance(to_file, str):
@@ -839,7 +784,6 @@ def perform_grid_search(x_train,y_train,model,param_grid,k=5):
 
 """
 - plot histogram does not look good (labelling etc.?)
-- evaluation function needs to be definied
--
-- define write to csv output --> remember to always specify Subdirectory!!! in EVERYTHING!
+- modify filter function for shading
+
 """
