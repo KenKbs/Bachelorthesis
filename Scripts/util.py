@@ -44,6 +44,67 @@ import matplotlib.pyplot as plt
 
 
 #%% General Functions
+
+def get_filepath(model_sd=False,shading=None):
+    
+    #Get current filepath of util script
+    try:
+        script_path=os.path.dirname(os.path.realpath(__file__))
+    
+    except NameError:
+        #handle the case where '__file__' is not defined, hard code directory
+        script_path = r"C:\Users\Kenny\Dropbox\Education\Uni\FU-Berlin\Inhalte\9. Semester\Bachelorarbeit\Programmierung\GitHub-Repo\Bachelorthesis\Scripts"
+    
+    #Case 1: Top Results directory -- model_sd=False (not a string)
+    parent_directory=os.path.abspath(os.path.join(script_path,os.pardir))
+    results_directory = os.path.join(parent_directory,"Results")
+
+
+
+
+    
+    #Case 2: Subdirectory of Results -- model_sd="LR","NN"..., shading = None
+    if isinstance(model_sd,str):
+        try:
+            results_directory= os.path.join(results_directory,model_sd)
+            if os.path.exists(results_directory):
+                pass
+            else:
+                raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
+        except ValueError as e: #Error handling, if Subdirectory not exists
+            print(f'ValueError: {e}')
+            os.makedirs(results_directory) #Create subdirectory if it does not exist    
+        
+        #Case 3: Subfolder "Shading" of specific model -- shading = True
+        if shading:
+            try:
+                results_directory= os.path.join(results_directory,"Shading")
+                if os.path.exists(results_directory):
+                    pass
+                else: #Error handling, if Subdirectory not exists
+                    raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
+            except ValueError as e: 
+                print(f'ValueError: {e}')
+                os.makedirs(results_directory) #Create subdirectory if it does not exist    
+        
+        #Case Handling 4:Subfolder "woShading" of specific model -- shading = False
+        elif shading==False:
+            try:
+                results_directory= os.path.join(results_directory,"woShading")
+                if os.path.exists(results_directory):
+                    pass
+                else: #Error handling, if Subdirectory not exists
+                    raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
+            except ValueError as e: 
+                print(f'ValueError: {e}')
+                os.makedirs(results_directory) #Create subdirectory if it does not exist    
+    
+    file_path=results_directory        
+            
+    return file_path
+    
+    
+
 def get_data():
     """
     Read in Raw-Data from Data folder in parent directory
@@ -366,30 +427,73 @@ def generate_table(data1, data2=None,data1_name='data1',data2_name='data2'):
     print (f'\n\nOverview of fault distribution\n {cross_table} \n\n')
 
 
-def write_output_to_csv():
-    pass
-    #Need to define what we want to write, also a lot of case handling required
-
-def save_best_model_to_file(best_model,to_file,shading=True,file_name="Best_model_"):
+def write_output_to_csv(output,output2=None,file_name="Results", to_file=None, shading=None):
     """
-    pickle best model to model subdirectory (LR, NN etc.)
-    give files for shading models distinct names "Best_model_LR_Shading //.._woShading"
+    Takes an output, converts it to a data-frame and writes it to csv file
 
     Parameters
     ----------
-    best_model : sk-learn model to pickle
+    output : dataFrame, dict, list, nparray
+        Data I want to write to CSV.
+    output2: dataFrame, dict, list, nparray
+        additional data to be appended to csv_file
+    file_name : Str, optional
+        Name of file, without file-extension. The default is "Results".
+    to_file : str, optional
+        which subdirectory to write to
+        e.g. "LR", or "NN" if none, wrote to top level results. The default is None.
+    shading : Bool, optional
+        If true, write to subfolder "Shading". 
+        if False, write to subfolder "woShading"
+        The default is None and writes to top level sd
 
-    to_file : str
+    """
+    #Specifiy File-path    
+    file_path=get_filepath(model_sd=to_file,shading=shading)
+    
+    #specify File-Name
+    file_name+=".csv" #Add file extension
+    
+    #Include full file_name to write to
+    file_path=os.path.join(file_path,file_name)
+    
+    #Convert to DataFrame if dict:
+    if isinstance(output,(dict,list,np.array)): 
+        output=pd.DataFrame(output)
+    
+    #Write to csv
+    output.to_csv(file_path,sep=";",index=True,index_label="index")
+    
+    #Append additional Output2 if it's a viable type
+    if isinstance(output2,(list,dict,pd.DataFrame,np.array)):
+        with open(file_path,"a") as file:
+            file.write("\n \n") #add Blank lines
+        output2=pd.DataFrame(output2)
+        output2.to_csv(file_path,mode="a",sep=";",header=True)
+        
+        
+
+
+def save_object_to_file(object_to_pickle,file_name,to_file=False,shading=None):
+    """
+    pickle an Object to a .pk1 file to load later.
+
+    Parameters
+    ----------
+    object_to_pickle : Any Object
+
+    to_file : str, False, OPTIONAL
         Model subdirectory to pickle in (LR,NN etc.)
+        or write to top level (results)
+        The default is False
     
     shading : Bool, optional
         if all data used (shading included) = True
         If shading is excluded = False. The default is True.
         
-    file_name : Str, optional
-        Give the saved pickle file a name. 
-        the to_file value e.g. "LR" will be added regardless. 
-        The default is "Best_model_"
+    file_name : Str
+        Give the saved pickle file a name. Don't include file extension. 
+        the to_file value e.g. "LR" and .pk1 will be added regardless. 
 
     Raises
     ------
@@ -401,47 +505,60 @@ def save_best_model_to_file(best_model,to_file,shading=True,file_name="Best_mode
     None.
 
     """
-    #Specify File Path and Name    
-    if isinstance(to_file,str): #Case handling 1: Save file to Model Subdirectory        
-        try:
-            #Attempt to get path of current script (does not work when not running whole file)
-            script_path = os.path.dirname(os.path.realpath(__file__))
+    
+    #get file_path
+    file_path=get_filepath(to_file,shading=shading)
         
-        except NameError:
-            #handle the case where '__file__' is not defined, hard code directory
-            script_path = r"C:\Users\Kenny\Dropbox\Education\Uni\FU-Berlin\Inhalte\9. Semester\Bachelorarbeit\Programmierung\GitHub-Repo\Bachelorthesis\Scripts"
-        
-        # Move up one directory and Navigate into Results-path
-        parent_directory = os.path.abspath(os.path.join(script_path,os.pardir))
-        results_directory = os.path.join(parent_directory,"Results")
-        
-        #Error Handling: Try navigating into Model subdirectory
-        try:
-            results_directory= os.path.join(results_directory,to_file)
-            if os.path.exists(results_directory):
-                pass
-            else:
-                raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
-        except ValueError as e: #Error handling, if Subdirectory not exists
-            print(f'ValueError: {e}')
-            os.makedirs(results_directory) #Create subdirectory if it does not exist    
-       
-        #Case Handling 2: Shading = True -- Shading included, save to sd "Shading"
+    #if subdirectory specified e.g. "LR"
+    if isinstance(to_file,str):
+        file_name += "_"
         file_name += to_file #name file: Best_model_MODEL-NAME 
-        if shading:
-            file_name+="_Shading"
-                            
-        #Case Handling 3: Shading = False, save to sd "woShading"
-        elif not shading:
-            file_name+="_woShading"
-            
-        #Save confusion Matrix to File as PDF    
-        file_path=os.path.join(results_directory,file_name)
-        
-        #Save best-model to pickle file
-        with open(file_path,'wb') as f:
-            pickle.dump(best_model,f)
-  
+    
+    #Add File-Extension    
+    file_name+=".pk1"
+    
+    #Save best model to pickle 
+    file_path=os.path.join(file_path,file_name)
+    
+    #Save best-model to pickle file
+    with open(file_path,'wb') as f:
+        pickle.dump(object_to_pickle,f)
+
+def load_object_from_file(file_name,file_path=None,to_file=False,shading=None):
+    """
+    
+
+    Parameters
+    ----------
+    file_name : String
+        Name of File to load. include file extension.
+    file_path : TYPE, optional
+        Explicitly state directory path
+        Else it's gotten from get_filepath(). The default is None.
+    to_file : Str, optional
+        Specify subdirectory ("LR", "NN" etc.). The default is False.
+    shading : Bool, optional
+        Specify shading subfolders. See get_filepath(). The default is None.
+
+    Returns
+    -------
+    loaded_object : ANYTHING
+        Loaded pickle object from file.
+
+    """
+    #get-Filepath if not explicitly stated
+    if not file_path == None:
+        file_path=get_filepath(model_sd=to_file,shading=shading)
+    
+    #Include filename to filepath
+    file_path=os.path.join(file_path,file_name)
+    
+    with open(file_path,"rb")as f:
+        loaded_object=pickle.load(f)
+    
+    return loaded_object
+
+    
         
 
 #%% Plotting
@@ -544,60 +661,68 @@ def plot_confusion_matrix(cm,
     
     #show the plot
     plt.show() 
-       
+    
+    
+    
+    
+    
     #save plot to directory
-    if isinstance(to_file,str) or to_file: #Case handling 1: Want to save to file (String or True)
-        # fig.subplots_adjust(bottom=2) #adjust cutoff value for bottom
-        try:
-            #Attempt to get path of current script (does not work when not running whole file)
-            script_path = os.path.dirname(os.path.realpath(__file__))
+    # if isinstance(to_file,str) or to_file: #Case handling 1: Want to save to file (String or True)
+    #     # fig.subplots_adjust(bottom=2) #adjust cutoff value for bottom
+    #     try:
+    #         #Attempt to get path of current script (does not work when not running whole file)
+    #         script_path = os.path.dirname(os.path.realpath(__file__))
         
-        except NameError:
-            #handle the case where '__file__' is not defined, hard code directory
-            script_path = r"C:\Users\Kenny\Dropbox\Education\Uni\FU-Berlin\Inhalte\9. Semester\Bachelorarbeit\Programmierung\GitHub-Repo\Bachelorthesis\Scripts"
+    #     except NameError:
+    #         #handle the case where '__file__' is not defined, hard code directory
+    #         script_path = r"C:\Users\Kenny\Dropbox\Education\Uni\FU-Berlin\Inhalte\9. Semester\Bachelorarbeit\Programmierung\GitHub-Repo\Bachelorthesis\Scripts"
         
-        # Move up one directory and Navigate into Results-path
-        parent_directory = os.path.abspath(os.path.join(script_path,os.pardir))
-        results_directory = os.path.join(parent_directory,"Results")
+    #     # Move up one directory and Navigate into Results-path
+    #     parent_directory = os.path.abspath(os.path.join(script_path,os.pardir))
+    #     results_directory = os.path.join(parent_directory,"Results")
         
-        #Case Handling 2: to_file = string deal with that as it is a subdirectory
-        if isinstance(to_file,str):
-            try:
-                results_directory= os.path.join(results_directory,to_file)
-                if os.path.exists(results_directory):
-                    pass
-                else:
-                    raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
-            except ValueError as e: #Error handling, if Subdirectory not exists
-                print(f'ValueError: {e}')
-                os.makedirs(results_directory) #Create subdirectory if it does not exist    
+    #     #Case Handling 2: to_file = string deal with that as it is a subdirectory
+    #     if isinstance(to_file,str):
+    #         try:
+    #             results_directory= os.path.join(results_directory,to_file)
+    #             if os.path.exists(results_directory):
+    #                 pass
+    #             else:
+    #                 raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
+    #         except ValueError as e: #Error handling, if Subdirectory not exists
+    #             print(f'ValueError: {e}')
+    #             os.makedirs(results_directory) #Create subdirectory if it does not exist    
            
-            #Case Handling 3: Shading = True -- Shading included, save to sd "Shading"
-            if shading:
-                try:
-                    results_directory= os.path.join(results_directory,"Shading")
-                    if os.path.exists(results_directory):
-                        pass
-                    else: #Error handling, if Subdirectory not exists
-                        raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
-                except ValueError as e: 
-                    print(f'ValueError: {e}')
-                    os.makedirs(results_directory) #Create subdirectory if it does not exist    
+    #         #Case Handling 3: Shading = True -- Shading included, save to sd "Shading"
+    #         if shading:
+    #             try:
+    #                 results_directory= os.path.join(results_directory,"Shading")
+    #                 if os.path.exists(results_directory):
+    #                     pass
+    #                 else: #Error handling, if Subdirectory not exists
+    #                     raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
+    #             except ValueError as e: 
+    #                 print(f'ValueError: {e}')
+    #                 os.makedirs(results_directory) #Create subdirectory if it does not exist    
             
-            #Case Handling 4: Shading = False, save to sd "woShading"
-            elif not shading:
-                try:
-                    results_directory= os.path.join(results_directory,"woShading")
-                    if os.path.exists(results_directory):
-                        pass
-                    else: #Error handling, if Subdirectory not exists
-                        raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
-                except ValueError as e: 
-                    print(f'ValueError: {e}')
-                    os.makedirs(results_directory) #Create subdirectory if it does not exist    
-                
+    #         #Case Handling 4: Shading = False, save to sd "woShading"
+    #         elif not shading:
+    #             try:
+    #                 results_directory= os.path.join(results_directory,"woShading")
+    #                 if os.path.exists(results_directory):
+    #                     pass
+    #                 else: #Error handling, if Subdirectory not exists
+    #                     raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
+    #             except ValueError as e: 
+    #                 print(f'ValueError: {e}')
+    #                 os.makedirs(results_directory) #Create subdirectory if it does not exist    
+    
+    #if filepath = str
+    if isinstance(to_file, str):
+        file_path=get_filepath(model_sd=to_file,shading=shading)
+            
         #Save confusion Matrix to File as PDF    
-        file_path=os.path.join(results_directory,f'{title}.pdf')
+        file_path=os.path.join(file_path,f'{title}.pdf')
         fig.savefig(file_path,format="pdf",bbox_inches='tight',pad_inches=0.1) #bbox_inches for not cutting off labels!
 
 

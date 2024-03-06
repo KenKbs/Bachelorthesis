@@ -18,7 +18,8 @@ from Scripts.util import (
     get_performance_metrics,
     get_confusion_matrix,
     plot_confusion_matrix,
-    save_best_model_to_file
+    write_output_to_csv,
+    save_object_to_file
 )
 
 #SK-learn model imports
@@ -83,19 +84,30 @@ y_pred_best=best_model.predict(x_test)
 accuracy=get_performance_metrics(y_test, y_pred_best,only_accuracy=True)
 
 #Get f1,recall,precision etc.
-report = get_performance_metrics(y_test, y_pred_best) #report=df
+report=get_performance_metrics(y_test, y_pred_best) #report=df
 
 #Get confusion Matrix
 cm=get_confusion_matrix(y_test, y_pred_best,normalize=False)
 
 #plot Confusion Matrix and save to file
-plot_confusion_matrix(cm,to_file="LR",normalize=True,shading="dunno")
+plot_confusion_matrix(cm,to_file="LR",normalize=True,shading=True)
 
-#save (pickle) best model to file
-save_best_model_to_file(best_model,shading=True,to_file="LR")
+#save best model to file
+save_object_to_file(best_model,file_name="Best_Model",
+                    to_file="LR",shading=True)
 
+#save confusion matrix to file:
+save_object_to_file(cm,file_name="Grid-search_CM",
+                    to_file="LR",shading=True)
 
-#Save results to csv_output
+#save report (f1_score etc.) to file:
+save_object_to_file(report,file_name="Grid-search_report",
+                    to_file="LR",shading=True)
+
+#Save Grid-search results to csv_file
+write_output_to_csv(cv_results,output2=report.round(4), #take rounded numbers of report for better overview
+                    file_name="Grid-search-results",
+                    to_file="LR",shading=True)
 
 
 
