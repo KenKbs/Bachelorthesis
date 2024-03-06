@@ -12,10 +12,11 @@ import os
 import sys #not needed yet?
 from scipy.io import loadmat #for loading mat-files
 
-#Pandas, Numpy, itertools
+#Pandas, Numpy, itertools,pickle
 import pandas as pd
 import numpy as np
 import itertools
+import pickle
 
 #SKlearn imports / Preprocessing
 from sklearn.model_selection import train_test_split
@@ -369,23 +370,96 @@ def write_output_to_csv():
     pass
     #Need to define what we want to write, also a lot of case handling required
 
-def save_best_model_to_file():
-    pass
+def save_best_model_to_file(best_model,to_file,shading=True,file_name="Best_model_"):
+    """
+    pickle best model to model subdirectory (LR, NN etc.)
+    give files for shading models distinct names "Best_model_LR_Shading //.._woShading"
+
+    Parameters
+    ----------
+    best_model : sk-learn model to pickle
+
+    to_file : str
+        Model subdirectory to pickle in (LR,NN etc.)
+    
+    shading : Bool, optional
+        if all data used (shading included) = True
+        If shading is excluded = False. The default is True.
+        
+    file_name : Str, optional
+        Give the saved pickle file a name. 
+        the to_file value e.g. "LR" will be added regardless. 
+        The default is "Best_model_"
+
+    Raises
+    ------
+    ValueError
+        if Path does not exist. It will create the specific path.
+
+    Returns
+    -------
+    None.
+
+    """
+    #Specify File Path and Name    
+    if isinstance(to_file,str): #Case handling 1: Save file to Model Subdirectory        
+        try:
+            #Attempt to get path of current script (does not work when not running whole file)
+            script_path = os.path.dirname(os.path.realpath(__file__))
+        
+        except NameError:
+            #handle the case where '__file__' is not defined, hard code directory
+            script_path = r"C:\Users\Kenny\Dropbox\Education\Uni\FU-Berlin\Inhalte\9. Semester\Bachelorarbeit\Programmierung\GitHub-Repo\Bachelorthesis\Scripts"
+        
+        # Move up one directory and Navigate into Results-path
+        parent_directory = os.path.abspath(os.path.join(script_path,os.pardir))
+        results_directory = os.path.join(parent_directory,"Results")
+        
+        #Error Handling: Try navigating into Model subdirectory
+        try:
+            results_directory= os.path.join(results_directory,to_file)
+            if os.path.exists(results_directory):
+                pass
+            else:
+                raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
+        except ValueError as e: #Error handling, if Subdirectory not exists
+            print(f'ValueError: {e}')
+            os.makedirs(results_directory) #Create subdirectory if it does not exist    
+       
+        #Case Handling 2: Shading = True -- Shading included, save to sd "Shading"
+        file_name += to_file #name file: Best_model_MODEL-NAME 
+        if shading:
+            file_name+="_Shading"
+                            
+        #Case Handling 3: Shading = False, save to sd "woShading"
+        elif not shading:
+            file_name+="_woShading"
+            
+        #Save confusion Matrix to File as PDF    
+        file_path=os.path.join(results_directory,file_name)
+        
+        #Save best-model to pickle file
+        with open(file_path,'wb') as f:
+            pickle.dump(best_model,f)
+  
         
 
 #%% Plotting
 def plot_confusion_matrix(cm,
                           target_names=None,
                           to_file=False,
+                          shading=True,
                           title='Confusion matrix',
                           cmap=None,
                           normalize=True):
     """
-    given a sklearn confusion matrix (cm) or, make a nice plot
+    given a sklearn confusion matrix (cm) or dataframe, make a nice plot
+    and optionally save to file
 
     Arguments
     ---------
     cm:           confusion matrix from sklearn.metrics.confusion_matrix
+                  or dataframe
 
     target_names: given classification classes such as [0, 1, 2]
                   the class names, for example: ['high', 'medium', 'low']
@@ -394,6 +468,11 @@ def plot_confusion_matrix(cm,
                   If True, save plot to results folder. If string
                   is given, save to subdirectory of results
                   OPTIONAL Default = False
+                  
+    shading:  Bool
+                  If True, saved into subdirectory with shading included folder
+                  If False: Case = shading excluded. Save results there
+                  OPTIONAL Defaullt = True
 
     title:        the text to display at the top of the matrix
 
@@ -467,7 +546,7 @@ def plot_confusion_matrix(cm,
     plt.show() 
        
     #save plot to directory
-    if isinstance(to_file,str) or to_file:
+    if isinstance(to_file,str) or to_file: #Case handling 1: Want to save to file (String or True)
         # fig.subplots_adjust(bottom=2) #adjust cutoff value for bottom
         try:
             #Attempt to get path of current script (does not work when not running whole file)
@@ -481,7 +560,7 @@ def plot_confusion_matrix(cm,
         parent_directory = os.path.abspath(os.path.join(script_path,os.pardir))
         results_directory = os.path.join(parent_directory,"Results")
         
-        #if to_file = string deal with that as it is a subdirectory
+        #Case Handling 2: to_file = string deal with that as it is a subdirectory
         if isinstance(to_file,str):
             try:
                 results_directory= os.path.join(results_directory,to_file)
@@ -489,10 +568,35 @@ def plot_confusion_matrix(cm,
                     pass
                 else:
                     raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
-            except ValueError as e:
+            except ValueError as e: #Error handling, if Subdirectory not exists
                 print(f'ValueError: {e}')
                 os.makedirs(results_directory) #Create subdirectory if it does not exist    
-      
+           
+            #Case Handling 3: Shading = True -- Shading included, save to sd "Shading"
+            if shading:
+                try:
+                    results_directory= os.path.join(results_directory,"Shading")
+                    if os.path.exists(results_directory):
+                        pass
+                    else: #Error handling, if Subdirectory not exists
+                        raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
+                except ValueError as e: 
+                    print(f'ValueError: {e}')
+                    os.makedirs(results_directory) #Create subdirectory if it does not exist    
+            
+            #Case Handling 4: Shading = False, save to sd "woShading"
+            elif not shading:
+                try:
+                    results_directory= os.path.join(results_directory,"woShading")
+                    if os.path.exists(results_directory):
+                        pass
+                    else: #Error handling, if Subdirectory not exists
+                        raise ValueError(f"the Subdirectory {results_directory} does not exist! It's beeing created.")    
+                except ValueError as e: 
+                    print(f'ValueError: {e}')
+                    os.makedirs(results_directory) #Create subdirectory if it does not exist    
+                
+        #Save confusion Matrix to File as PDF    
         file_path=os.path.join(results_directory,f'{title}.pdf')
         fig.savefig(file_path,format="pdf",bbox_inches='tight',pad_inches=0.1) #bbox_inches for not cutting off labels!
 
@@ -532,7 +636,8 @@ def plot_histogram (df,title="Histogram"):
 #%% Grid search functions
 def perform_grid_search(x_train,y_train,model,param_grid,k=5):
     """
-    
+    Performs grid search with predifined parameters and 
+    returns best model and Results from grid search
 
     Parameters
     ----------

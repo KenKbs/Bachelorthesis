@@ -6,7 +6,7 @@ Created on Mon Feb 12 15:21:50 2024
 """
 
 #%% Imports 
-#Main imports done in util.py
+#Main package imports done in util.py
 
 #Internal imports
 from Scripts.util import (
@@ -17,7 +17,8 @@ from Scripts.util import (
     perform_grid_search,
     get_performance_metrics,
     get_confusion_matrix,
-    plot_confusion_matrix
+    plot_confusion_matrix,
+    save_best_model_to_file
 )
 
 #SK-learn model imports
@@ -87,8 +88,12 @@ report = get_performance_metrics(y_test, y_pred_best) #report=df
 #Get confusion Matrix
 cm=get_confusion_matrix(y_test, y_pred_best,normalize=False)
 
-#plot Confusion Matrix
-plot_confusion_matrix(cm,to_file="LR",normalize=True)
+#plot Confusion Matrix and save to file
+plot_confusion_matrix(cm,to_file="LR",normalize=True,shading="dunno")
+
+#save (pickle) best model to file
+save_best_model_to_file(best_model,shading=True,to_file="LR")
+
 
 #Save results to csv_output
 
