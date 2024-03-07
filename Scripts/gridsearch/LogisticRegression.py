@@ -101,7 +101,9 @@ def run_LR_gridsearch(shading=True):
     #%% Save Results to file / csv 
     
     #plot Confusion Matrix and save to file
-    plot_confusion_matrix(cm,to_file="LR",normalize=True,shading=shading,title="Grid-search ConfusionMatrix LR")
+    plot_confusion_matrix(cm,to_file="LR",show_plot=False,normalize=True,
+                          shading=shading,
+                          title="Grid-search ConfusionMatrix LR")
          
     #save best model to file
     save_object_to_file(best_model,file_name="Best_Model",

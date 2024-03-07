@@ -611,6 +611,7 @@ def load_object_from_file(file_name,file_path=None,to_file=False,shading=None):
 def plot_confusion_matrix(cm,
                           target_names=None,
                           to_file=False,
+                          show_plot=False,
                           shading=True,
                           title='Confusion matrix',
                           cmap=None,
@@ -630,6 +631,10 @@ def plot_confusion_matrix(cm,
     to_file:      Bool, String
                   If True, save plot to results folder. If string
                   is given, save to subdirectory of results
+                  OPTIONAL Default = False
+                  
+    show_plot:    Bool
+                  Shows plot if True.
                   OPTIONAL Default = False
                   
     shading:  Bool
@@ -705,8 +710,9 @@ def plot_confusion_matrix(cm,
     #get current figure for saving to filepath later
     fig=plt.gcf() 
     
-    #show the plot
-    plt.show() 
+    #show the plot if show_plot = True
+    if show_plot:
+        plt.show() 
     
     #if filepath = str
     if isinstance(to_file, str):
