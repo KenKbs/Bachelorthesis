@@ -77,10 +77,10 @@ def run_LR_gridsearch(shading=True):
     param_grid={'C':penalization_param}
     
     #TESTING
-    param_grid_t={'C':[1,1000]} #REMOVE LATER AND CHANGE FUNCTION CALL!
+    #param_grid_t={'C':[1,1000]} #REMOVE LATER AND CHANGE FUNCTION CALL!
     
     #%%Perform Grid_search
-    best_model,cv_results=perform_grid_search(x_train,y_train,logreg,param_grid_t)
+    best_model,cv_results=perform_grid_search(x_train,y_train,logreg,param_grid)
     
     #Get best_model parameters
     best_model_params=best_model.get_params()
