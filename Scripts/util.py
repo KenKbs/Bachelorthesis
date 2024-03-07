@@ -406,17 +406,21 @@ def generate_table(data1, data2=None,data1_name='data1',data2_name='data2'):
     data1_count = data1['f_nv'].value_counts().rename(data1_name) # Absolute Values     
     data1_relcount = data1['f_nv'].value_counts(normalize=True).rename('perc.1') # Relative Value
 
-    if data2 is not None:
-        # Manipulated Data
+    if data2 is not None:       
+        # Manipulated Data (absolute and relative values)       
         data2_count = data2['f_nv'].value_counts().rename(data2_name)
         data2_relcount = data2['f_nv'].value_counts(normalize=True).rename('perc.2')
+
+        # Reset index for both data-frames
+        data1.reset_index(inplace=True)
+        data2.reset_index(inplace=True)        
 
         # Create Table with two columns
         cross_table = pd.concat([
             data1_count,
-            data1_relcount.apply(lambda x: f"{x:.6f}"),
+            data1_relcount.apply(lambda x: f"{x:.4f}"),
             data2_count,
-            data2_relcount.apply(lambda x: f"{x:.6f}")
+            data2_relcount.apply(lambda x: f"{x:.4f}")
         ], axis=1, sort=True)
 
         # Add Total Row
@@ -431,7 +435,7 @@ def generate_table(data1, data2=None,data1_name='data1',data2_name='data2'):
         # Create Table with one column
         cross_table = pd.concat([
             data1_count,
-            data1_relcount.apply(lambda x: f"{x:.6f}")
+            data1_relcount.apply(lambda x: f"{x:.4f}")
         ], axis=1, sort=True)
 
         # Add Total Row
@@ -447,7 +451,15 @@ def generate_table(data1, data2=None,data1_name='data1',data2_name='data2'):
     
     #fill NA with 0 (for example if no shading cases)
     cross_table = cross_table.fillna(0)
-
+    
+    #Remove trailing .0 for data2 if not same cases included 
+    cross_table[data2_name] = cross_table[data2_name].astype(int).astype(str)
+    cross_table[data2_name] = cross_table[data2_name].apply(lambda x: x[:-2] if x.endswith('.0') else x)
+    
+    # Convert the shaded and raw columns to integers and then to strings with thousands separators
+    cross_table[data2_name] = cross_table[data2_name].astype(int).apply(lambda x: "{:,}".format(x))
+    cross_table[data1_name] = cross_table[data1_name].astype(int).apply(lambda x: "{:,}".format(x))
+    
     # Display the table
     print (f'\n\nOverview of fault distribution\n {cross_table} \n\n')
 

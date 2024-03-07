@@ -21,9 +21,8 @@ generate_table(raw_data,data,"raw","filtered")
 
 generate_table(raw_data,shaded_data,"raw","shaded")
 
-# info_data=shaded_data.info
-# shaded_data.describe()
-# shaded_data.head
+generate_table(data,shaded_data,"filtered","shaded")
+
 
 # if __name__=="__main__":
 #     LRGS.run_LR_gridsearch(shading=True) #Runs Gridsearch with shading class inlcuded
