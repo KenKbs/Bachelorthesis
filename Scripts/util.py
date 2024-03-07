@@ -201,7 +201,7 @@ def filter_data(data, filter_value=-1,shading=True):
     
     # Calculate removed cases
     removed_cases=raw_cases-data['f_nv'].count()
-    f_removed_cases='{:,}'.format(removed_cases).replace(',','.') #format number
+    f_removed_cases='{:,}'.format(removed_cases) #format number
             
     # Print removed cases
     print(f'\nNumber of low-irrediance cases removed: {f_removed_cases}')
@@ -213,11 +213,11 @@ def filter_data(data, filter_value=-1,shading=True):
         
         #Calculate removed shading cases:
         removed_shading_cases=pre_shaded_data['f_nv'].count()-data['f_nv'].count()
-        f_removed_shading_cases='{:,}'.format(removed_shading_cases).replace(',','.') #format number
+        f_removed_shading_cases='{:,}'.format(removed_shading_cases) #format number
         
         #Calculate grand total cases removed:
         GT_cases=removed_cases+removed_shading_cases
-        GT_cases='{:,}'.format(GT_cases).replace(',','.') #format Cases
+        GT_cases='{:,}'.format(GT_cases) #format Cases
         
         #Print removed shading cases and overall cases:
         print(f'\nTotal number of shading cases removed: {f_removed_shading_cases}')
@@ -452,19 +452,20 @@ def generate_table(data1, data2=None,data1_name='data1',data2_name='data2'):
     #fill NA with 0 (for example if no shading cases)
     cross_table = cross_table.fillna(0)
     
-    #Remove trailing .0 for data2 if not same cases included 
-    cross_table[data2_name] = cross_table[data2_name].astype(int).astype(str)
-    cross_table[data2_name] = cross_table[data2_name].apply(lambda x: x[:-2] if x.endswith('.0') else x)
+    if data2 is not None:
+        #Remove trailing .0 for data2 if not same cases included 
+        cross_table[data2_name] = cross_table[data2_name].astype(int).astype(str)
+        cross_table[data2_name] = cross_table[data2_name].apply(lambda x: x[:-2] if x.endswith('.0') else x)
     
-    # Convert the shaded and raw columns to integers and then to strings with thousands separators
-    cross_table[data2_name] = cross_table[data2_name].astype(int).apply(lambda x: "{:,}".format(x))
+        # Convert the shaded and raw columns to integers and then to strings with thousands separators
+        cross_table[data2_name] = cross_table[data2_name].astype(int).apply(lambda x: "{:,}".format(x))
     cross_table[data1_name] = cross_table[data1_name].astype(int).apply(lambda x: "{:,}".format(x))
     
     # Display the table
     print (f'\n\nOverview of fault distribution\n {cross_table} \n\n')
 
 
-def write_output_to_csv(output,output2=None,file_name="Results", to_file=None, shading=None):
+def write_output_to_csv(output,output2=None,output3=None,file_name="Results", to_file=None, shading=None):
     """
     Takes an output, converts it to a data-frame and writes it to csv file
 
@@ -473,6 +474,8 @@ def write_output_to_csv(output,output2=None,file_name="Results", to_file=None, s
     output : dataFrame, dict, list, nparray
         Data I want to write to CSV.
     output2: dataFrame, dict, list, nparray
+        additional data to be appended to csv_file
+    output3: dataFrame, dict, list, nparray
         additional data to be appended to csv_file
     file_name : Str, optional
         Name of file, without file-extension. The default is "Results".
@@ -507,7 +510,13 @@ def write_output_to_csv(output,output2=None,file_name="Results", to_file=None, s
             file.write("\n \n") #add Blank lines
         output2=pd.DataFrame(output2)
         output2.to_csv(file_path,mode="a",sep=";",header=True)
-        
+    
+    #Append additional Output3 if it's a viable type
+    if isinstance(output3,(list,dict,pd.DataFrame,np.array)):
+        with open(file_path,"a") as file:
+            file.write("\n \n") #add Blank lines
+        output3=pd.DataFrame([output3])
+        output3.to_csv(file_path,mode="a",sep=";",header=True,index=False)
         
 
 

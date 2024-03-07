@@ -4,7 +4,6 @@ Created on Mon Feb 12 15:21:50 2024
 
 @author: Kenny
 """
-
 #%% Imports 
 #Main package imports done in util.py
 
@@ -33,12 +32,19 @@ def run_LR_gridsearch(shading=True):
     #Read-in Data
     raw_data=get_data()
     
-    #Filter out low irrediance values
-    data=filter_data(raw_data,filter_value=100)
+    #filter data
+    data=filter_data(raw_data,filter_value=100,shading=shading)
     
-    #Print fault distribution before and after fitering
-    generate_table(raw_data,data,"raw","filtered") 
+    #Print out fault distribution before and after filtering
     
+    #Include shading cases
+    if shading:
+        generate_table(raw_data,data,"Raw","Filtered")
+    
+    #Exclude shading casees
+    else:
+        generate_table(raw_data,data,"Raw","Shad. excl")
+                
     
     #%%Grid search preparations
     
@@ -75,6 +81,8 @@ def run_LR_gridsearch(shading=True):
     #%%Perform Grid_search
     best_model,cv_results=perform_grid_search(x_train,y_train,logreg,param_grid_t)
     
+    #Get best_model parameters
+    best_model_params=best_model.get_params()
     
     #%%Performance evaluation
     
@@ -89,10 +97,12 @@ def run_LR_gridsearch(shading=True):
     
     #Get confusion Matrix
     cm=get_confusion_matrix(y_test, y_pred_best,normalize=False)
+        
+    #%% Save Results to file / csv 
     
     #plot Confusion Matrix and save to file
     plot_confusion_matrix(cm,to_file="LR",normalize=True,shading=shading,title="Grid-search ConfusionMatrix LR")
-    
+         
     #save best model to file
     save_object_to_file(best_model,file_name="Best_Model",
                         to_file="LR",shading=shading)
@@ -107,6 +117,7 @@ def run_LR_gridsearch(shading=True):
     
     #Save Grid-search results to csv_file
     write_output_to_csv(cv_results,output2=report.round(4), #take rounded numbers of report for better overview
+                        output3=best_model_params,
                         file_name="Grid-search-results",
                         to_file="LR",shading=shading)
     
