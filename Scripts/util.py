@@ -108,7 +108,7 @@ def get_filepath(model_sd=False,shading=None):
 def get_data():
     """
     Read in Raw-Data from Data folder in parent directory
-
+            
     Returns
     -------
     main_data : Dataframe
@@ -161,11 +161,11 @@ def get_data():
     main_data=pd.DataFrame(combined_array)
     new_headings=["f_nv","irr","pvt","idc1","idc2","vdc1","vdc2"]
     main_data.columns=new_headings
-
+    
     return main_data
 
 
-def filter_data(data, filter_value=-1):
+def filter_data(data, filter_value=-1,shading=True):
     """
     takes raw_data, sorts it by faults and irrediance values
     and cuts out any low_irrediance values below or equal to filter_value
@@ -178,6 +178,8 @@ def filter_data(data, filter_value=-1):
     cutoff_irr_value : Float, int, optional
         Set Cutoff for low irrediance Values
         If set to <0, no filtering is done. The default is -1.(0 is alr. filtering) 
+    shading : bool
+        If true, include shading class, if false, exclude shading class
 
     Returns
     -------
@@ -199,10 +201,30 @@ def filter_data(data, filter_value=-1):
     
     # Calculate removed cases
     removed_cases=raw_cases-data['f_nv'].count()
-    
+    f_removed_cases='{:,}'.format(removed_cases).replace(',','.') #format number
+            
     # Print removed cases
-    print(f'\nTotal number of cases removed: {removed_cases}')
-       
+    print(f'\nNumber of low-irrediance cases removed: {f_removed_cases}')
+    
+    #When Shading = False    
+    if not shading:
+        pre_shaded_data=data
+        data=data.drop(data[data['f_nv']==4].index) #remove shading cases
+        
+        #Calculate removed shading cases:
+        removed_shading_cases=pre_shaded_data['f_nv'].count()-data['f_nv'].count()
+        f_removed_shading_cases='{:,}'.format(removed_shading_cases).replace(',','.') #format number
+        
+        #Calculate grand total cases removed:
+        GT_cases=removed_cases+removed_shading_cases
+        GT_cases='{:,}'.format(GT_cases).replace(',','.') #format Cases
+        
+        #Print removed shading cases and overall cases:
+        print(f'\nTotal number of shading cases removed: {f_removed_shading_cases}')
+        print(f'\nGrandTotal cases removed: {GT_cases} ')
+    
+    #print Spacer and return data
+    print('\n')        
     return data
     
 
@@ -422,6 +444,9 @@ def generate_table(data1, data2=None,data1_name='data1',data2_name='data2'):
     cross_table.index = category_labels
 
     cross_table = pd.concat([cross_table, total_row])
+    
+    #fill NA with 0 (for example if no shading cases)
+    cross_table = cross_table.fillna(0)
 
     # Display the table
     print (f'\n\nOverview of fault distribution\n {cross_table} \n\n')
