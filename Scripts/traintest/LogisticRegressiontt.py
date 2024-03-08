@@ -19,9 +19,7 @@ from Scripts.util import (
     save_object_to_file,
     convert_to_srow)
 
-# shading = True #put later into function
-# num_iterations=2 #times how often train/test split also put later into function
-
+#%% main function
 def run_LR_traintest(shading=True,num_iterations=100):
     """
     Repeaditly trains and tests LR model and saves
@@ -34,6 +32,8 @@ def run_LR_traintest(shading=True,num_iterations=100):
     num_iterations : Int, optional
         How often train-test is performed and evaluated.
         The default is 100.
+        note: the first "run" is always the result from the gridsearch
+        so if value = 100 --> 99 runs from repeaditly train/test, one from GS
 
     Returns
     -------
@@ -142,7 +142,7 @@ def run_LR_traintest(shading=True,num_iterations=100):
     #plot Confusion Matrix and save to pdf, also show plot!
     plot_confusion_matrix(cm_all,to_file="LR",show_plot=True,normalize=True,
                           shading=shading,
-                          title=f"TestTrain ConfusionMatrix LR shading = {shading}")
+                          title=f"TestTrain ConfusionMatrix LR shading {shading}")
          
     #save (absolute) confusion matrix to file:
     save_object_to_file(cm_all,file_name="TestTrain_CM_LR",

@@ -858,6 +858,7 @@ def _is_convertible_to_float(value):
     except ValueError:
         return False
 
+
 def convert_to_srow (df,insert_value=None,extract_labels=False):
     """
     takes a dataframe and makes a single row out of it
@@ -880,11 +881,22 @@ def convert_to_srow (df,insert_value=None,extract_labels=False):
     """
     #Extract labels if True
     if extract_labels:
-        single_row = [f'{col}_{ix}' if _is_convertible_to_float(idx) else f'{col}_{idx}' for ix, idx in enumerate(df.index) for col in df.columns]
+        single_row = [f'{col}_{ix}' if _is_convertible_to_float(idx) else f'{col}_{idx}' for ix, idx in enumerate(df.index) for col in df.columns] 
    
     #Else Cast to single row
     else:
         single_row=df.values.flatten()
+    
+    """
+    little wild but what happens in that if extract_labels is to check, whether 
+    the index of the dataframe is still a float number or already a string
+    if it's a floating number, write the current counter of the for loop into 
+    the single row (so we don't have floats but clean integers)
+    if it's not a float it's text so now we take the actual value of the index
+    and write it to the single_row variable
+    --> all this is done for casehandling shading, if we have a dataframe with indexes 
+    0-3 and "average" and "weighted" or if we have cases 0-4 and "average" and "weighted" 
+    """
     
     #Insert optional value in first position
     if insert_value is not None:
@@ -897,6 +909,5 @@ def convert_to_srow (df,insert_value=None,extract_labels=False):
 
 """
 - plot histogram does not look good (labelling etc.?)
-- modify filter function for shading
 
 """
