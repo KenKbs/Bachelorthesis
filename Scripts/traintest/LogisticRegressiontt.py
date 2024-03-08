@@ -94,6 +94,8 @@ def run_LR_traintest(shading=True,num_iterations=100):
         file.write(';'.join(row_labels)+'\n')
         file.write(';'.join(map(str,single_row))+'\n')
     
+        #Print Progress
+        print(f'Run {run} successfully completed \n')
     
     #%%Rpeaditly train_test data
         for i in range (num_iterations):
@@ -128,6 +130,9 @@ def run_LR_traintest(shading=True,num_iterations=100):
             
             #Add up Confusion Matrix
             cm_all=cm_all+cm_tt
+            
+            #print progress
+            print(f' Run {run} successfully completed \n')
             
         ##END LOOP 
     ##CLOSE FILE
