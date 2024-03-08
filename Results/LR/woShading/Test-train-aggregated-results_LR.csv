@@ -1,0 +1,18 @@
+index;precision;recall;f1-score;support
+0.0;1.0;1.0;1.0;61851.0
+1.0;0.9937;0.9912;0.9925;1200.0
+2.0;0.9947;0.9932;0.994;2074.0
+3.0;0.9959;1.0;0.9979;1205.0
+macro avg;0.9961;0.9961;0.9961;66330.0
+weighted avg;0.9996;0.9996;0.9996;66330.0
+
+ 
+;0;1;2;3
+0;123701;0;1;0
+1;0;2379;21;0
+2;3;15;4120;10
+3;0;0;0;2410
+
+ 
+C;class_weight;dual;fit_intercept;intercept_scaling;l1_ratio;max_iter;multi_class;n_jobs;penalty;random_state;solver;tol;verbose;warm_start
+3250;;False;True;1;;500;multinomial;;l2;;newton-cg;0.0001;0;False

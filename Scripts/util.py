@@ -833,6 +833,65 @@ def perform_grid_search(x_train,y_train,model,param_grid,k=5):
     #Return best model and search results
     return best_model,cv_results
 
+#%% Test Train functions
+
+def _is_convertible_to_float(value):
+    """
+    private function
+    checks if value is convertible to float
+    needed to extract headings of dataframe without passing
+    shading argument explicitly
+
+    Parameters
+    ----------
+    value : ANY
+        Value to be checked.
+
+    Returns
+    -------
+    bool
+        if convertible = True else False.
+    """
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
+
+def convert_to_srow (df,insert_value=None,extract_labels=False):
+    """
+    takes a dataframe and makes a single row out of it
+
+    Parameters
+    ----------
+    df : DataFrame
+        Data to write to a single row
+    insert_value : int, float, optional
+        Inserts a Value at first position of resulting string. The default is None.
+    extract_labels: bool, optional
+        makes the single row so it's the headings and indexes of a dataframe. 
+        The default is False
+
+    Returns
+    -------
+    single_row: np.Array
+        All Values within one row without indexes or headings
+
+    """
+    #Extract labels if True
+    if extract_labels:
+        single_row = [f'{col}_{ix}' if _is_convertible_to_float(idx) else f'{col}_{idx}' for ix, idx in enumerate(df.index) for col in df.columns]
+   
+    #Else Cast to single row
+    else:
+        single_row=df.values.flatten()
+    
+    #Insert optional value in first position
+    if insert_value is not None:
+        single_row=np.insert(single_row,0,insert_value)
+    
+    return single_row
+
 
 #%% ToDo
 
