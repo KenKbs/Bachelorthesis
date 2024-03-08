@@ -3,3 +3,6 @@
 
 #Ignore Spyproject directory
 **/.spyproject/
+
+#Ignore Backup Results
+**/BACKUP REAL RESULTS/
