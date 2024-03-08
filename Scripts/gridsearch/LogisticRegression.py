@@ -121,7 +121,7 @@ def run_LR_gridsearch(shading=True):
     #Save Grid-search results to csv_file
     write_output_to_csv(cv_results,output2=report.round(4), #take rounded numbers of report for better overview
                         output3=best_model_params,
-                        file_name="Grid-search-results",
+                        file_name="Grid-search-results_LR",
                         to_file="LR",shading=shading)
     
 

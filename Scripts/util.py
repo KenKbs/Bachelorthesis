@@ -476,7 +476,7 @@ def write_output_to_csv(output,output2=None,output3=None,file_name="Results", to
     output2: dataFrame, dict, list, nparray
         additional data to be appended to csv_file
     output3: dataFrame, dict, list, nparray
-        additional data to be appended to csv_file
+        MUST BE A SINGLE LINER e.g. Best parameters of model
     file_name : Str, optional
         Name of file, without file-extension. The default is "Results".
     to_file : str, optional
@@ -497,22 +497,23 @@ def write_output_to_csv(output,output2=None,output3=None,file_name="Results", to
     #Include full file_name to write to
     file_path=os.path.join(file_path,file_name)
     
-    #Convert to DataFrame if dict:
-    if isinstance(output,(dict,list,np.array)): 
-        output=pd.DataFrame(output)
+    # if isinstance(output,(list,dict,np.array)): 
+    output=pd.DataFrame(output)
     
     #Write to csv
     output.to_csv(file_path,sep=";",index=True,index_label="index")
     
     #Append additional Output2 if it's a viable type
-    if isinstance(output2,(list,dict,pd.DataFrame,np.array)):
+    # if isinstance(output2,(list,dict,pd.DataFrame,np.array)):
+    if output2 is not None:
         with open(file_path,"a") as file:
             file.write("\n \n") #add Blank lines
         output2=pd.DataFrame(output2)
         output2.to_csv(file_path,mode="a",sep=";",header=True)
     
     #Append additional Output3 if it's a viable type
-    if isinstance(output3,(list,dict,pd.DataFrame,np.array)):
+    # if isinstance(output3,(list,dict,pd.DataFrame,np.array)):
+    if output3 is not None:
         with open(file_path,"a") as file:
             file.write("\n \n") #add Blank lines
         output3=pd.DataFrame([output3])
@@ -570,9 +571,10 @@ def save_object_to_file(object_to_pickle,file_name,to_file=False,shading=None):
     with open(file_path,'wb') as f:
         pickle.dump(object_to_pickle,f)
 
+
 def load_object_from_file(file_name,file_path=None,to_file=False,shading=None):
     """
-    
+    unpickles an saved object and returns that object
 
     Parameters
     ----------
