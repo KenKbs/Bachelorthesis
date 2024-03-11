@@ -1,0 +1,11 @@
+index;Number of nodes:;Depth of the tree:;Number of features:;Accuracy
+0;3005.0;34.0;7.0;0.9962593999534848
+1;3025.0;40.0;7.0;0.9963272346693542
+2;2987.0;36.0;7.0;0.9959977517637026
+3;2983.0;37.0;7.0;0.9962690906271804
+4;3027.0;35.0;7.0;0.9960752771532677
+Max;3027.0;40.0;7.0;0.9963272346693542
+
+ 
+ccp_alpha;class_weight;criterion;max_depth;max_features;max_leaf_nodes;min_impurity_decrease;min_samples_leaf;min_samples_split;min_weight_fraction_leaf;random_state;splitter
+0.0;;gini;;;;0.0;1;2;0.0;;best
