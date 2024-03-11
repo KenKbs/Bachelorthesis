@@ -5,27 +5,45 @@ Main-Script to run, main entry point!
 
 if __name__ == "__main__":  
     #%% Imports
-    import Scripts    
+    import Scripts #for Util
+    
+    #Gridsearch Imports
     import Scripts.gridsearch.LogisticRegression as GLR
-    import Scripts.traintest.LogisticRegressiontt as TTLR
     import Scripts.gridsearch.DecisionTree as DT
+    
+    #Traintest Imports
+    import Scripts.traintest.LogisticRegressiontt as TTLR
+
     
     #%%Testing
     #Renaming util module 
     UT=Scripts.util        
-    #print(UT.get_filepath(model_sd="LR",shading=True))
+    # print(UT.get_filepath(model_sd="LR",shading=True))
         
     #%%Run Gridsearch
-    #GLR.run_LR_gridsearch(shading=True)
-    #GLR.run_LR_gridsearch(shading=False)
+    
+    #Logistic Regression
+    # GLR.run_LR_gridsearch(shading=True)
+    # GLR.run_LR_gridsearch(shading=False)
+    
+    
+    #Decision Tree
+    # DT.overfit_DT(shading=True,runs=100)
+    DT.run_DT_gridsearch(shading=True)
+    
+    DT.overfit_DT(shading=False,runs=100)
+    DT.run_DT_gridsearch(shading=False)
 
 
+    #SVM
 
     #%%Run Test-split repeaditly
+    
+    #Logistic Regression
     #TTLR.run_LR_traintest(shading=True,num_iterations=100)
     #TTLR.run_LR_traintest(shading=False,num_iterations=100)
     
-    
+    #Decsion Tree
     
     
     
