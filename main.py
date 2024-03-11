@@ -8,6 +8,7 @@ if __name__ == "__main__":
     import Scripts    
     import Scripts.gridsearch.LogisticRegression as GLR
     import Scripts.traintest.LogisticRegressiontt as TTLR
+    import Scripts.gridsearch.DecisionTree as DT
     
     #%%Testing
     #Renaming util module 
@@ -18,9 +19,12 @@ if __name__ == "__main__":
     #GLR.run_LR_gridsearch(shading=True)
     #GLR.run_LR_gridsearch(shading=False)
 
+
+
     #%%Run Test-split repeaditly
     #TTLR.run_LR_traintest(shading=True,num_iterations=100)
-    TTLR.run_LR_traintest(shading=False,num_iterations=100)
+    #TTLR.run_LR_traintest(shading=False,num_iterations=100)
+    
     
     
     
