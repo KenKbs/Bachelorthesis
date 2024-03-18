@@ -31,8 +31,8 @@ if __name__ == "__main__":
     # DT.overfit_DT(shading=True,runs=100)
     DT.run_DT_gridsearch(shading=True)
     
-    DT.overfit_DT(shading=False,runs=100)
-    DT.run_DT_gridsearch(shading=False)
+    #DT.overfit_DT(shading=False,runs=100)
+    #DT.run_DT_gridsearch(shading=False)
 
 
     #SVM

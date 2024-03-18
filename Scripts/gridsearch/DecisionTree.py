@@ -30,13 +30,23 @@ from Scripts.util import (
 )
 
 #SK-learn model imports
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.tree import export_graphviz
+from sklearn.tree import (DecisionTreeClassifier,
+                          export_graphviz,
+                          plot_tree)
 
 #Other Imports
-import graphviz
 import pandas as pd
 import numpy as np
+
+#try importing graphviz problems, if not correctly installed
+try:   
+    import graphviz
+except Exception as e:
+    print("Failed to import module graphviz",e,"\n")
+    print("Using Matplotlib")
+
+import matplotlib.pyplot as plt
+
 
 
 
@@ -96,7 +106,7 @@ def run_DT_gridsearch(shading=True):
     
     #append values from   
     min_samples_split.extend(x for x in range(3,26,1))
-    
+   
     
     #min_samples_leaf 
     # min_samples_leaf=[1] # minimum number of samples required in last decision leafs
@@ -183,12 +193,27 @@ def run_DT_gridsearch(shading=True):
     file_path=parent_file_path+r'\Gridsearch_tree'
     
     # Plot and save decision Tree
-    dot_data = export_graphviz(best_model, out_file=None, filled=True, rounded=True, special_characters=True)
-    graph = graphviz.Source(dot_data)
-    graph.render(file_path)  # Save the visualization as a file
-    graph.view()  # Display the decision tree in the default viewer
-
-
+    # With Graphviz
+    try: 
+        dot_data = export_graphviz(best_model, out_file=None, filled=True, rounded=True, special_characters=True)
+        graph = graphviz.Source(dot_data)
+        graph.render(file_path, format="pdf")  # Save the visualization as a file
+        graph.view()  # Display the decision tree in the default viewer
+    
+    #if Error, render with matplotlib
+    except Exception as e:
+        print("Error occured while rendering with graphviz:",e,"\n\n")
+        print("Attempt to render using Matplotlib")       
+        file_path+=r'.pdf'
+        plt.figure(figsize=(120, 60))  # Set the figure size
+        plot_tree(best_model, filled=True, rounded=True)#, feature_names=feature_names, class_names=target_names)  # Plot the decision tree
+        plt.savefig(file_path)  # Save the plot to a file
+    
+    """
+    graphviz does not work from console, if not added to system path
+    because adding to system path is kinda inconvenient, did a try except statement
+    with a different visualisation tool.
+    """
 
 #%%Overfit Decision Tree (just default values)
 def overfit_DT (shading=True,runs=100):
@@ -312,10 +337,23 @@ def overfit_DT (shading=True,runs=100):
     file_path=parent_file_path+r'\Overfitted_tree'
     
     # Plot and save decision Tree only of last run as example
-    dot_data = export_graphviz(best_model, out_file=None, filled=True, rounded=True, special_characters=True)
-    graph = graphviz.Source(dot_data)
-    graph.render(file_path)  # Save the visualization as a file
-    graph.view()  # Display the decision tree in the default viewer
+    # With Graphviz
+    try: 
+        dot_data = export_graphviz(best_model, out_file=None, filled=True, rounded=True, special_characters=True)
+        graph = graphviz.Source(dot_data)
+        graph.render(file_path, format="pdf")  # Save the visualization as a file
+        graph.view()  # Display the decision tree in the default viewer    
+    
+    #With matplotlib if it fails
+    except Exception as e:
+        print("Error occured while rendering with graphviz:",e,"\n\n")
+        print("Attempt to render using Matplotlib")       
+        file_path+=r'.pdf'
+        plt.figure(figsize=(120, 60))  # Set the figure size
+        plot_tree(best_model, filled=True, rounded=True)#, feature_names=feature_names, class_names=target_names)  # Plot the decision tree
+        plt.savefig(file_path)  # Save the plot to a file
+    
     
 #run function for testing:
 #overfit_DT(shading=False,runs=2)
+#run_DT_gridsearch(shading=True)
