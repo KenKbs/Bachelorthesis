@@ -126,7 +126,7 @@ def run_LR_traintest(shading=True,num_iterations=100):
             
             #Combine Dataframes for aggregated results
             #report - incremental average approach due to memory
-            report_all=(report_all+report_tt)/2
+            report_all=report_all+((report_tt-report_all)/run)
             
             #Add up Confusion Matrix
             cm_all=cm_all+cm_tt

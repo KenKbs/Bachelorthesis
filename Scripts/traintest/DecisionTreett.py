@@ -106,12 +106,12 @@ with open(file_path,'w') as file:
 #%%Rpeaditly train_test data
     for i in range (num_iterations):
         #Change run counter
-        run=i+2 #because first "run" = results of Gridsearch
+        run=i+2 #because first "run" = results of Gridsearch also equal to n
         
         # Split data w. own fuinction, scaling = True
         x_train, x_test, y_train, y_test = train_test_split_data(data=data,
                                                                  test_size=0.2,
-                                                                 scaling=True)    
+                                                                 scaling=False)  #no z-transformation anymore  
         #Refit to new data
         decision_tree.fit(x_train,y_train)
             
@@ -133,7 +133,10 @@ with open(file_path,'w') as file:
         
         #Combine Dataframes for aggregated results
         #report - incremental average approach due to memory
-        report_all=(report_all+report_tt)/2
+        report_all=report_all+((report_tt-report_all)/run)
+        """
+        u_n=u_n-1+(x_n-u_n-1)/n
+        """
         
         #Add up Confusion Matrix
         cm_all=cm_all+cm_tt
@@ -147,22 +150,22 @@ with open(file_path,'w') as file:
 #%% Save aggregated Results to file / pdf
 
 #Write aggregated report, cm etc. to seperate csv_file
-params=logreg.get_params() #get params of model
-write_output_to_csv(report_all.round(4),cm_all,params,file_name="Test-train-aggregated-results_LR",
-                    to_file="LR",shading=shading)
+params=decision_tree.get_params() #get params of model
+write_output_to_csv(report_all.round(4),cm_all,params,file_name="Test-train-aggregated-results_DT",
+                    to_file="DT",shading=shading)
   
 #plot Confusion Matrix and save to pdf
-plot_confusion_matrix(cm_all,to_file="LR",show_plot=False,normalize=True,
+plot_confusion_matrix(cm_all,to_file="DT",show_plot=False,normalize=True,
                       shading=shading,
-                      title=f"TestTrain ConfusionMatrix LR shading {shading}")
+                      title=f"TestTrain ConfusionMatrix DT shading {shading}")
      
 #save (absolute) confusion matrix to file:
-save_object_to_file(cm_all,file_name="TestTrain_CM_LR",
-                    to_file="LR",shading=shading)
+save_object_to_file(cm_all,file_name="TestTrain_CM_DT",
+                    to_file="DT",shading=shading)
 
 #save (aggregated) report (f1_score etc.) to file:
-save_object_to_file(report_all,file_name="TestTrain_report_LR",
-                    to_file="LR",shading=shading)
+save_object_to_file(report_all,file_name="TestTrain_report_DT",
+                    to_file="DT",shading=shading)
 
 #Print result
 print(f'All data has been sucessfully written to files \nSee Filepath:\n {parent_file_path}')

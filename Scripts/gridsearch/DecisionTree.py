@@ -93,7 +93,7 @@ def run_DT_gridsearch(shading=True):
     max_depth=[None] #- prevent overfitting, depth of tree
     #append values from 1 to 41 in steps = 1 to list
     #Define range to search for (taken from overfitted_tree for both cases)
-    max_range=42 if shading else 25 
+    max_range=41 if shading else 21 
     max_depth.extend(x for x in range (1,max_range,1))
         
     #max_leaf_nodes
