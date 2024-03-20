@@ -29,16 +29,19 @@ if __name__ == "__main__":
     
     
     #Decision Tree
-    DT.overfit_DT(shading=True,runs=100)
-    DT.overfit_DT(shading=False,runs=100)
+    #DT.overfit_DT(shading=True,runs=100)
+    #DT.overfit_DT(shading=False,runs=100)
     DT.run_DT_gridsearch(shading=True)
     DT.run_DT_gridsearch(shading=False)
     
     #DT.overfit_DT(shading=False,runs=100)
     #DT.run_DT_gridsearch(shading=False)
 
+    #Random Forest    
 
     #SVM
+    
+    #Neural Network
 
     #%%Run Test-split repeaditly
     
