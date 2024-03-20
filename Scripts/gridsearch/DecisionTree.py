@@ -72,9 +72,10 @@ def run_DT_gridsearch(shading=True):
     
     #%%Grid search preparations
     
-    # Split data w. own fuinction, scaling = True
+    # Split data w. own fuinction, scaling = False
     x_train, x_test, y_train, y_test = train_test_split_data(data=data,
-                                                             test_size=0.2,scaling=True)
+                                                             test_size=0.2,
+                                                             scaling=False)
     
     # Define Model to tune (Decision Tree)
     dctree=DecisionTreeClassifier(splitter="best",class_weight=None,
@@ -87,48 +88,39 @@ def run_DT_gridsearch(shading=True):
     
     # Criterion
     Criterion=["gini","entropy"] #,"log_loss"] #log loss same as shanon entropy! #Gini usually better!
-    
-    
+        
     #max_depth 
     max_depth=[None] #- prevent overfitting, depth of tree
     #append values from 1 to 41 in steps = 1 to list
-    max_depth.extend(x for x in range (1,42,1))
-    
-    
+    #Define range to search for (taken from overfitted_tree for both cases)
+    max_range=42 if shading else 25 
+    max_depth.extend(x for x in range (1,max_range,1))
+        
     #max_leaf_nodes
-    # max_leaf_nodes=[None] # maximum number of leaf nodes
-    
+    # max_leaf_nodes=[None] # maximum number of leaf nodes    
     #append values from 50 to 3050 in 50 steps
     # max_leaf_nodes.extend(x for x in range (500,3001,100))
-    
-    
+        
     #min_samples_split  
-    min_samples_split=[2] #minimum number of samples requiered for splitting a node
-    
+    min_samples_split=[2] #minimum number of samples requiered for splitting a node    
     #append values from   
     min_samples_split.extend(x for x in range(3,26,1))
-   
-    
+       
     #min_samples_leaf 
     # min_samples_leaf=[1] # minimum number of samples required in last decision leafs
     # min_samples_leaf.extend(x for x in range(2,26,1))
-    
-    
+        
     #max_features
-    max_features=[None] # - randomly select x features, from these x features, determine which is best to split and do the splitting
-    
+    max_features=[None] # - randomly select x features, from these x features, determine which is best to split and do the splitting    
     #append 1 to 6, because 7 = maxfeatures, this case covered with None
     max_features.extend(x for x in range (1,7,1))    
-    
-    
+        
     #ccp_alpha 
-    ccp_alpha=[0.0] ## minimal cost pruning, after fitting complete prune tree - small alpha values!!!
-    
+    ccp_alpha=[0.0] ## minimal cost pruning, after fitting complete prune tree - small alpha values!!!    
     #append 0.005 to 0.501 in 0.005 steps
     ccp_alpha.extend(np.arange(0.005,0.501,0.005))
     
-    
-    
+        
     #Give over parameters to parameter grid to search for
     param_grid={'criterion':Criterion,
                 'max_depth':max_depth,
@@ -235,10 +227,7 @@ def overfit_DT (shading=True,runs=100):
     #Exclude shading casees
     else:
         generate_table(raw_data,data,"Raw","Shad. excl")
-                
-    
-    #%%Grid search preparations - dertimine parameter ranges to tune:
-    
+                        
     #Starting values
     #define empty lists
     num_nodes_all=[]
@@ -246,11 +235,12 @@ def overfit_DT (shading=True,runs=100):
     num_features_all=[]
     accuracy_all=[]   
     
-    #5 runs with "overfitted" Tree to see stats of that algorithm
+    #number of runs with "overfitted" Tree to see stats of that algorithm
     for run in range (runs):
-        # Split data w. own fuinction, scaling = True
+        # Split data w. own fuinction, scaling = False
         x_train, x_test, y_train, y_test = train_test_split_data(data=data,
-                                                                 test_size=0.2,scaling=True)
+                                                                 test_size=0.2,
+                                                                 scaling=False)
         
         #Define Model to tune (Logistic Regression)
         dctree=DecisionTreeClassifier(splitter="best",criterion="gini",
@@ -281,7 +271,7 @@ def overfit_DT (shading=True,runs=100):
         print("Depth of the tree:", tree_depth,"\n")
         tree_depth_all.append(tree_depth)
         
-        #Features
+        #Features (should be the same for every run)
         num_features = best_model.n_features_in_
         print("Number of features:", num_features,"\n")
         num_features_all.append(num_features)
@@ -290,7 +280,7 @@ def overfit_DT (shading=True,runs=100):
         num_classes = best_model.n_classes_
         print("Number of classes:", num_classes,"\n")
         
-        #Feature importance
+        #Feature importance - will not be used later, would imply class_weights
         feature_importance = best_model.feature_importances_
         print("Feature importance:", feature_importance,"\n")
             
@@ -298,6 +288,7 @@ def overfit_DT (shading=True,runs=100):
         accuracy=get_performance_metrics(y_test, y_pred_best,only_accuracy=True)
         accuracy_all.append(accuracy)
         
+        #Print seperator
         print ("*"*40)
     
     #%% Save Results to file / csv 
