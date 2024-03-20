@@ -5,7 +5,8 @@ Main-Script to run, main entry point!
 
 if __name__ == "__main__":  
     #%% Imports
-    import Scripts #for Util
+    import Scripts #for Util    
+    UT=Scripts.util #Renaming util module 
     
     #Gridsearch Imports
     import Scripts.gridsearch.LogisticRegression as GLR
@@ -13,11 +14,11 @@ if __name__ == "__main__":
     
     #Traintest Imports
     import Scripts.traintest.LogisticRegressiontt as TTLR
+    import Scripts.traintest.DecisionTreett as TTDT
 
     
     #%%Testing
-    #Renaming util module 
-    UT=Scripts.util        
+       
     # print(UT.get_filepath(model_sd="LR",shading=True))
         
     #%%Run Gridsearch
@@ -42,10 +43,11 @@ if __name__ == "__main__":
     #%%Run Test-split repeaditly
     
     #Logistic Regression
-    #TTLR.run_LR_traintest(shading=True,num_iterations=100)
-    #TTLR.run_LR_traintest(shading=False,num_iterations=100)
+    TTLR.run_LR_traintest(shading=True,num_iterations=100)
+    TTLR.run_LR_traintest(shading=False,num_iterations=100)
     
-    #Decsion Tree
-    
+    #Decsion Tree train-test
+    TTDT.run_DT_traintest(shading=True,num_iterations=100)
+    TTDT.run_DT_traintest(shdaing=False,num_iterations=100)
     
     

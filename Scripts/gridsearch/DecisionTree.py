@@ -37,6 +37,7 @@ from sklearn.tree import (DecisionTreeClassifier,
 #Other Imports
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 #try importing graphviz problems, if not correctly installed
 # command with conda: conda install -c conda-forge pygraphviz
@@ -46,13 +47,28 @@ except Exception as e:
     print("Failed to import module graphviz",e,"\n")
     print("Using Matplotlib")
 
-import matplotlib.pyplot as plt
+
 
 
 
 
 #%% Gridsearch
 def run_DT_gridsearch(shading=True):
+    """
+    Runs Gridsearch for decision Tree and writes the best results
+    to directory Results/DT
+
+    Parameters
+    ----------
+    shading : Bool, optional
+        if True, includes shading class
+        Else excludes it. The default is True.
+
+    Returns
+    -------
+    None.
+
+    """
     #Read-in Data
     raw_data=get_data()
     
@@ -91,7 +107,6 @@ def run_DT_gridsearch(shading=True):
         
     #max_depth 
     max_depth=[None] #- prevent overfitting, depth of tree
-    #append values from 1 to 41 in steps = 1 to list
     #Define range to search for (taken from overfitted_tree for both cases)
     max_range=41 if shading else 21 
     max_depth.extend(x for x in range (1,max_range,1))
@@ -132,10 +147,10 @@ def run_DT_gridsearch(shading=True):
                 }
     
     #TESTING
-    param_grid_t={'criterion':Criterion} #REMOVE LATER AND CHANGE FUNCTION CALL!
+    #param_grid_t={'criterion':Criterion} #REMOVE LATER AND CHANGE FUNCTION CALL!
     
     #%%Perform Grid_search
-    best_model,cv_results=perform_grid_search(x_train,y_train,dctree,param_grid_t)
+    best_model,cv_results=perform_grid_search(x_train,y_train,dctree,param_grid)
     
     #Get best_model parameters
     best_model_params=best_model.get_params()
