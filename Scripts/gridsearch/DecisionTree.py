@@ -39,6 +39,7 @@ import pandas as pd
 import numpy as np
 
 #try importing graphviz problems, if not correctly installed
+# command with conda: conda install -c conda-forge pygraphviz
 try:   
     import graphviz
 except Exception as e:
@@ -166,7 +167,7 @@ def run_DT_gridsearch(shading=True):
     #%% Save Results to file / csv 
     
     #plot Confusion Matrix and save to file
-    plot_confusion_matrix(cm,to_file="DT",show_plot=True,normalize=True,
+    plot_confusion_matrix(cm,to_file="DT",show_plot=False,normalize=True,
                           shading=shading,
                           title=f"Grid-search ConfusionMatrix DT shading {shading}")
         
@@ -305,7 +306,7 @@ def overfit_DT (shading=True,runs=100):
     cm=get_confusion_matrix(y_test, y_pred_best,normalize=False)
     
     #plot last Confusion Matrix and save to file
-    plot_confusion_matrix(cm,to_file="DT",show_plot=True,normalize=True,
+    plot_confusion_matrix(cm,to_file="DT",show_plot=False,normalize=True,
                           shading=shading,
                           title=f"Overfitted ConfusionMatrix DT shading {shading}")
     

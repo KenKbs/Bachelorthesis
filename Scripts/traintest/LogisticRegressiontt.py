@@ -144,8 +144,8 @@ def run_LR_traintest(shading=True,num_iterations=100):
     write_output_to_csv(report_all.round(4),cm_all,params,file_name="Test-train-aggregated-results_LR",
                         to_file="LR",shading=shading)
       
-    #plot Confusion Matrix and save to pdf, also show plot!
-    plot_confusion_matrix(cm_all,to_file="LR",show_plot=True,normalize=True,
+    #plot Confusion Matrix and save to pdf
+    plot_confusion_matrix(cm_all,to_file="LR",show_plot=False,normalize=True,
                           shading=shading,
                           title=f"TestTrain ConfusionMatrix LR shading {shading}")
          
