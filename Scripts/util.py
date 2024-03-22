@@ -409,11 +409,7 @@ def generate_table(data1, data2=None,data1_name='data1',data2_name='data2'):
     if data2 is not None:       
         # Manipulated Data (absolute and relative values)       
         data2_count = data2['f_nv'].value_counts().rename(data2_name)
-        data2_relcount = data2['f_nv'].value_counts(normalize=True).rename('perc.2')
-
-        # Reset index for both data-frames
-        data1.reset_index(inplace=True)
-        data2.reset_index(inplace=True)        
+        data2_relcount = data2['f_nv'].value_counts(normalize=True).rename('perc.2')    
 
         # Create Table with two columns
         cross_table = pd.concat([
