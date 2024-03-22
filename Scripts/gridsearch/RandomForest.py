@@ -150,10 +150,10 @@ param_grid={'criterion':Criterion,
             }
 
 #TESTING
-#param_grid_t={'criterion':Criterion} #REMOVE LATER AND CHANGE FUNCTION CALL!
+param_grid_t={'criterion':Criterion} #REMOVE LATER AND CHANGE FUNCTION CALL!
 
 #%%Perform Grid_search
-best_model,cv_results=perform_grid_search(x_train,y_train,rForest,param_grid)
+best_model,cv_results=perform_grid_search(x_train,y_train,rForest,param_grid_t)
 
 #Get best_model parameters
 best_model_params=best_model.get_params()
