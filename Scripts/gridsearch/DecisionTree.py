@@ -127,8 +127,8 @@ def run_DT_gridsearch(shading=True):
         
     #max_features
     max_features=[None] # - randomly select x features, from these x features, determine which is best to split and do the splitting    
-    #append 1 to 6, because 7 = maxfeatures, this case covered with None
-    max_features.extend(x for x in range (1,7,1))    
+    #append 1 to 5, because 6 = maxfeatures, this case covered with None
+    max_features.extend(x for x in range (1,6,1))    
         
     #ccp_alpha 
     ccp_alpha=[0.0] ## minimal cost pruning, after fitting complete prune tree - small alpha values!!!    
