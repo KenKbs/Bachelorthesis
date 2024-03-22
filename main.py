@@ -24,8 +24,8 @@ if __name__ == "__main__":
     #%%Run Gridsearch
     
     #Logistic Regression
-    # GLR.run_LR_gridsearch(shading=True)
-    # GLR.run_LR_gridsearch(shading=False)
+    GLR.run_LR_gridsearch(shading=True)
+    GLR.run_LR_gridsearch(shading=False)
     
     
     #Decision Tree
