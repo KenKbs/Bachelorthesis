@@ -30,21 +30,25 @@ from Scripts.util import (
 )
 
 #SK-learn model imports
-from sklearn.ensemble import (RandomForestClassifier,
-                          )
+from sklearn.ensemble import (RandomForestClassifier
+                                                    )
+from sklearn.tree import (export_graphviz,
+                          plot_tree
+                                    )
+
 
 # #Other Imports
 # import pandas as pd
 import numpy as np
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
-# #try importing graphviz problems, if not correctly installed
-# # command with conda: conda install -c conda-forge pygraphviz
-# try:   
-#     import graphviz
-# except Exception as e:
-#     print("Failed to import module graphviz",e,"\n")
-#     print("Using Matplotlib")
+#try importing graphviz problems, if not correctly installed
+# command with conda: conda install -c conda-forge pygraphviz
+try:   
+    import graphviz
+except Exception as e:
+    print("Failed to import module graphviz",e,"\n")
+    print("Using Matplotlib")
 
 
 
@@ -97,7 +101,7 @@ x_train, x_test, y_train, y_test = train_test_split_data(data=data,
                                                          scaling=False)
 
 #%% Define Model to tune (Decision Tree)
-rForest=RandomForestClassifier(splitter="best",class_weight=None,
+rForest=RandomForestClassifier(class_weight=None,
                               min_weight_fraction_leaf=0.0,
                               min_impurity_decrease=0.0,
                               max_leaf_nodes=None,
@@ -130,13 +134,24 @@ min_samples_split.extend(x for x in range(3,26,1))
     
 #max_features
 max_features=[None] # - randomly select x features, from these x features, determine which is best to split and do the splitting    
-#append 1 to 6, because 7 = maxfeatures, this case covered with None
-max_features.extend(x for x in range (1,7,1))    
+#append 1 to 5, because 6 = maxfeatures, this case covered with None
+max_features.extend(x for x in range (1,6,1))    
     
 #ccp_alpha 
 ccp_alpha=[0.0] ## minimal cost pruning, after fitting complete prune tree - small alpha values!!!    
 #append 0.005 to 0.501 in 0.005 steps
 ccp_alpha.extend(np.arange(0.005,0.501,0.005))
+
+###ADDITIONAL RF VARIABLES######
+bootstrap=[True] ##look into that, parameters like max_samples depend on that!
+bootstrap.extend(False)
+
+n_estimators=[100] #default
+n_estimators.extend(x for x in range (1,100,5))
+#njobs????
+#verbose????
+#random_state????
+#max_samples??? int,float or None (default)
 
     
 #Give over parameters to parameter grid to search for
@@ -146,7 +161,8 @@ param_grid={'criterion':Criterion,
             # 'min_samples_leaf':min_samples_leaf,
             'max_features':max_features,
             # 'max_leaf_nodes':max_leaf_nodes,
-            'ccp_alpha':ccp_alpha
+            'ccp_alpha':ccp_alpha,
+            'bootstrap':bootstrap
             }
 
 #TESTING
@@ -203,31 +219,40 @@ write_output_to_csv(cv_results,output2=report.round(4), #take rounded numbers of
 parent_file_path=get_filepath(model_sd="RF",shading=shading)
 file_path=parent_file_path+r'\Gridsearch_RF'
 
-# Plot and save decision Tree
+#%% Plot and save decision Tree
 
-cn=
+#Extract feature and class names
+fn=x_test.columns.tolist()
+cn=y_test.unique().tolist()
+cn=sorted(cn)
 
-# With Graphviz
-try: 
-    dot_data = export_graphviz(best_model, out_file=None, filled=True, rounded=True, special_characters=True)
-    graph = graphviz.Source(dot_data)
-    graph.render(file_path, format="pdf")  # Save the visualization as a file
-    graph.view()  # Display the decision tree in the default viewer
 
-#if Error, render with matplotlib
-except Exception as e:
-    print("Error occured while rendering with graphviz:",e,"\n\n")
-    print("Attempt to render using Matplotlib")       
-    
-    
-    
-    
-    
-    
-    # file_path+=r'.pdf'
-    # plt.figure(figsize=(120, 60))  # Set the figure size
-    # plot_tree(best_model, filled=True, rounded=True)#, feature_names=feature_names, class_names=target_names)  # Plot the decision tree
-    # plt.savefig(file_path)  # Save the plot to a file
+fig,axes = plt.subplots(nrows=1,ncols=1,figsize=(4,4),dpi=800)
+plot_tree(best_model.estimators_[0],feature_names=fn,
+               class_names=cn,filled=True)
+
+fig.savefig('rf_individualtree.pdf')
+
+
+
+
+
+
+# With Graphviz OLD!!!
+# try: 
+#     dot_data = export_graphviz(best_model, out_file=None, filled=True, rounded=True, special_characters=True)
+#     graph = graphviz.Source(dot_data)
+#     graph.render(file_path, format="pdf")  # Save the visualization as a file
+#     graph.view()  # Display the decision tree in the default viewer
+
+# #if Error, render with matplotlib
+# except Exception as e:
+#     print("Error occured while rendering with graphviz:",e,"\n\n")
+#     print("Attempt to render using Matplotlib")           
+#     file_path+=r'.pdf'
+#     plt.figure(figsize=(120, 60))  # Set the figure size
+#     plot_tree(best_model, filled=True, rounded=True)#, feature_names=feature_names, class_names=target_names)  # Plot the decision tree
+#     plt.savefig(file_path)  # Save the plot to a file
 
 """
 graphviz does not work from console, if not added to system path
