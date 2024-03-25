@@ -814,7 +814,7 @@ def perform_grid_search(x_train,y_train,model,param_grid,k=5):
     
     #pre_dispatch
     #limit amount of jobs spawned immediatly due to memory explosion
-    pre_dispatch='4*n_jobs' #see SK-learn documentation
+    pre_dispatch='3*n_jobs' #see joblib documentation
     
     #Set Output (in console) during grid-search
     verbose=2 
