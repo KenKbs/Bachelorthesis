@@ -151,7 +151,7 @@ def run_DT_gridsearch(shading=True):
     #param_grid_t={'criterion':Criterion} #REMOVE LATER AND CHANGE FUNCTION CALL!
     
     #%%Perform Grid_search
-    with parallel_config(temp_folder='/temp'): #Change temporary folder to where space is (C:/temp)
+    with parallel_config(temp_folder='/temp',max_nbytes='4M'): #Change temporary folder to where space is (C:/temp)
         best_model,cv_results=perform_grid_search(x_train,y_train,dctree,param_grid)
     
     #Get best_model parameters
