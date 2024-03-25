@@ -24,15 +24,15 @@ if __name__ == "__main__":
     #%%Run Gridsearch
     
     #Logistic Regression
-    GLR.run_LR_gridsearch(shading=True)
-    GLR.run_LR_gridsearch(shading=False)
+    # GLR.run_LR_gridsearch(shading=True)
+    # GLR.run_LR_gridsearch(shading=False)
     
     
     #Decision Tree
     #DT.overfit_DT(shading=True,runs=100)
     #DT.overfit_DT(shading=False,runs=100)
     DT.run_DT_gridsearch(shading=True)
-    DT.run_DT_gridsearch(shading=False)
+    # DT.run_DT_gridsearch(shading=False)
     
     #DT.overfit_DT(shading=False,runs=100)
     #DT.run_DT_gridsearch(shading=False)

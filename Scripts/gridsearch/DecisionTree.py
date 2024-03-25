@@ -48,7 +48,8 @@ except Exception as e:
     print("Using Matplotlib")
 
 
-
+#bug-fix -Memory overflow
+from joblib.parallel import parallel_config # requires joblib 1.3 or higher
 
 
 
@@ -150,10 +151,11 @@ def run_DT_gridsearch(shading=True):
     #param_grid_t={'criterion':Criterion} #REMOVE LATER AND CHANGE FUNCTION CALL!
     
     #%%Perform Grid_search
-    best_model,cv_results=perform_grid_search(x_train,y_train,dctree,param_grid)
+    with parallel_config(temp_folder='/temp'): #Change temporary folder to where space is (C:/temp)
+        best_model,cv_results=perform_grid_search(x_train,y_train,dctree,param_grid)
     
     #Get best_model parameters
-    best_model_params=best_model.get_params()
+        best_model_params=best_model.get_params()
     
     
     #%%Performance evaluation

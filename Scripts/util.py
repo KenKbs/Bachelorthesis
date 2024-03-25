@@ -812,12 +812,17 @@ def perform_grid_search(x_train,y_train,model,param_grid,k=5):
     #Set CPU-Usage
     n_jobs=-1 # all CPU Cores used
     
+    #pre_dispatch
+    #limit amount of jobs spawned immediatly due to memory explosion
+    pre_dispatch='4*n_jobs' #see SK-learn documentation
+    
     #Set Output (in console) during grid-search
     verbose=2 
     
     #Create GridSearchCV object
     grid_search=GridSearchCV(model, param_grid,scoring=scoring_metric,
-                             cv=cv, refit=refit,n_jobs=n_jobs,verbose=verbose)
+                             cv=cv, refit=refit,n_jobs=n_jobs,
+                             pre_dispatch=pre_dispatch,verbose=verbose)
     
     #Fit the grid search to given data
     grid_search.fit(x_train,y_train)
