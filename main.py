@@ -53,4 +53,7 @@ if __name__ == "__main__":
     TTDT.run_DT_traintest(shading=True,num_iterations=100)
     TTDT.run_DT_traintest(shdaing=False,num_iterations=100)
     
+    #Testing for DOT export
+    # UT.plot_from_dot_file("Overfitted_tree", shading=True, to_file="DT",#file_path=r'C:\Users\Kenny\Dropbox\Education\Uni\FU-Berlin\Inhalte\9. Semester\Bachelorarbeit\Programmierung\GitHub-Repo\Bachelorthesis\Results\DT\Shading',
+    #                       output_filename="Test123")
     

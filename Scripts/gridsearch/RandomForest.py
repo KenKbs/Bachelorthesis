@@ -109,7 +109,7 @@ rForest=RandomForestClassifier(class_weight=None,
                               min_samples_leaf=1)
 
 #%% Set Parameter to tune 
-"""
+
 
 # Criterion
 Criterion=["gini","entropy"] #,"log_loss"] #log loss same as shanon entropy! #Gini usually better!
@@ -150,12 +150,12 @@ bootstrap.extend(False)
 
 n_estimators=[100] #default
 n_estimators.extend(x for x in range (1,100,5))
-#njobs????
-#verbose????
-#random_state????
+#njobs???? --> should stay at default 1 (single core) to avoid over multi-processing
+#verbose???? --> dunno
+#random_state???? 
 #max_samples??? int,float or None (default)
 
-    
+#Can we just use the "best parameters" of Gridsearch for DT?
 #Give over parameters to parameter grid to search for
 param_grid={'criterion':Criterion,
             'max_depth':max_depth,
@@ -216,9 +216,6 @@ write_output_to_csv(cv_results,output2=report.round(4), #take rounded numbers of
                     output3=best_model_params,
                     file_name="Grid-search-results_RF",
                     to_file="RF",shading=shading)
-"""
-
-
 
 #Get output path
 parent_file_path=get_filepath(model_sd="RF",shading=shading)
@@ -226,56 +223,36 @@ file_path=parent_file_path+r'\Gridsearch_RF'
 
 #%% Plot and save decision Tree
 
-best_model=load_object_from_file("Best_Model_RF.pk1",
-                                 to_file="RF",shading=True) #TESTING!
-
 #Extract feature and class names
 fn=x_test.columns.tolist()
 cn=y_test.unique().tolist()
 cn=sorted(cn)
+
 #cast into string
 cn=[str(Float) for Float in cn]
 
 
-#Plot with Matplotlib
-fig,axes = plt.subplots(nrows=1,ncols=1,figsize=(150,50),dpi=200)
-plot_tree(best_model.estimators_[0],feature_names=fn, class_names=cn,
-                filled=True)
-
-fig.savefig('rf_individualtree.png')
-fig.savefig('rf_individualtree.pdf')
-
-fig,axes=plt.subplots(nrows=1,ncols=5,figsize=(150,50))
-for sub_tree in range (0,5):
-    plot_tree(best_model.estimators_[sub_tree],
-              feature_names=fn,
-              class_names=cn,
-              filled=True,
-              ax=axes[sub_tree])
-    axes[sub_tree].set_title('Estimator'+ str(sub_tree),fontsize=11)
-
-fig.savefig('rf_multipletrees.png')
-fig.savefig('rf_multipletrees.pdf')
+#Plot with Matplotlib first tree of fores
 
 
+#Plot one Tree of RF
+try: 
+    dot_data = export_graphviz(best_model, out_file=None, filled=True, 
+                               rounded=True, special_characters=True,
+                               feature_names=fn,class_names=cn)
+    graph = graphviz.Source(dot_data)
+    graph.render(file_path, format="pdf")  # Save the visualization as a file
+    graph.view()  # Display the decision tree in the default viewer
 
-
-
-# With Graphviz OLD!!!
-# try: 
-#     dot_data = export_graphviz(best_model, out_file=None, filled=True, rounded=True, special_characters=True)
-#     graph = graphviz.Source(dot_data)
-#     graph.render(file_path, format="pdf")  # Save the visualization as a file
-#     graph.view()  # Display the decision tree in the default viewer
-
-# #if Error, render with matplotlib
-# except Exception as e:
-#     print("Error occured while rendering with graphviz:",e,"\n\n")
-#     print("Attempt to render using Matplotlib")           
-#     file_path+=r'.pdf'
-#     plt.figure(figsize=(120, 60))  # Set the figure size
-#     plot_tree(best_model, filled=True, rounded=True)#, feature_names=feature_names, class_names=target_names)  # Plot the decision tree
-#     plt.savefig(file_path)  # Save the plot to a file
+#if Error, render with matplotlib, first tree of forest
+except Exception as e:
+    print("Error occured while rendering with graphviz:",e,"\n\n")
+    print("Attempt to render using Matplotlib")           
+    file_path+=r'.pdf'
+    fig,axes = plt.subplots(nrows=1,ncols=1,figsize=(150,50),dpi=200)
+    plot_tree(best_model.estimators_[0],feature_names=fn, 
+              class_names=cn,filled=True)
+    plt.savefig(file_path)  # Save the plot to pdf-file
 
 """
 graphviz does not work from console, if not added to system path
@@ -283,144 +260,4 @@ because adding to system path is kinda inconvenient, did a try except statement
 with a different visualisation tool.
 """
 
-#%%Overfit Decision Tree (just default values)
-def overfit_RF (shading=True,runs=100):
-    pass
-    # #%% Read in and filter data
-    
-    # #Read-in Data
-    # raw_data=get_data()
-    
-    # #filter data
-    # data=filter_data(raw_data,filter_value=100,shading=shading)
-    
-    # #Print out fault distribution before and after filtering
-    
-    # #Include shading cases
-    # if shading:
-    #     generate_table(raw_data,data,"Raw","Filtered")
-    
-    # #Exclude shading casees
-    # else:
-    #     generate_table(raw_data,data,"Raw","Shad. excl")
-                        
-    # #Starting values
-    # #define empty lists
-    # num_nodes_all=[]
-    # tree_depth_all=[]
-    # num_features_all=[]
-    # accuracy_all=[]   
-    
-    # #number of runs with "overfitted" Tree to see stats of that algorithm
-    # for run in range (runs):
-    #     # Split data w. own fuinction, scaling = False
-    #     x_train, x_test, y_train, y_test = train_test_split_data(data=data,
-    #                                                              test_size=0.2,
-    #                                                              scaling=False)
-        
-    #     #Define Model to tune (Logistic Regression)
-    #     dctree=DecisionTreeClassifier(splitter="best",criterion="gini",
-    #                                   max_depth=None,min_samples_split=2,
-    #                                   min_samples_leaf=1,max_features=None,
-    #                                   ccp_alpha=0.0,max_leaf_nodes=None,
-    #                                   min_impurity_decrease=0.0)
-        
-    #     #%% TESTING OF DECISION TREE to determine which paramter ranges to tune!
-        
-    #     best_model=dctree
-    #     best_model.fit(x_train,y_train)
-           
-    #     #Predictions on test-set
-    #     y_pred_best=best_model.predict(x_test)
-                            
-    #     #Print out stuff
-    #     #current run    
-    #     print(f"Current run: {run+1} \n")
-        
-    #     #Number nodes
-    #     num_nodes = best_model.tree_.node_count
-    #     print("Number of nodes:", num_nodes,"\n")
-    #     num_nodes_all.append(num_nodes)
-        
-    #     #depth
-    #     tree_depth = best_model.get_depth()
-    #     print("Depth of the tree:", tree_depth,"\n")
-    #     tree_depth_all.append(tree_depth)
-        
-    #     #Features (should be the same for every run)
-    #     num_features = best_model.n_features_in_
-    #     print("Number of features:", num_features,"\n")
-    #     num_features_all.append(num_features)
-        
-    #     #Number of classes
-    #     num_classes = best_model.n_classes_
-    #     print("Number of classes:", num_classes,"\n")
-        
-    #     #Feature importance - will not be used later, would imply class_weights
-    #     feature_importance = best_model.feature_importances_
-    #     print("Feature importance:", feature_importance,"\n")
-            
-    #     #Get Accuracy Score
-    #     accuracy=get_performance_metrics(y_test, y_pred_best,only_accuracy=True)
-    #     accuracy_all.append(accuracy)
-        
-    #     #Print seperator
-    #     print ("*"*40)
-    
-    # #%% Save Results to file / csv 
-    
-    # #Get confusion Matrix only for last run as example
-    # cm=get_confusion_matrix(y_test, y_pred_best,normalize=False)
-    
-    # #plot last Confusion Matrix and save to file
-    # plot_confusion_matrix(cm,to_file="DT",show_plot=False,normalize=True,
-    #                       shading=shading,
-    #                       title=f"Overfitted ConfusionMatrix DT shading {shading}")
-    
-    # #create Dataframe and write to csv
-    # dt_overfitted=pd.DataFrame()
-    
-    # #Append important values
-    # dt_overfitted["Number of nodes:"]=num_nodes_all
-    # dt_overfitted["Depth of the tree:"]=tree_depth_all
-    # dt_overfitted["Number of features:"]=num_features_all
-    # dt_overfitted["Accuracy"]=accuracy_all
-    
-    # #Append Max-Values
-    # max_values = dt_overfitted.max()
-    # dt_overfitted.loc[len(dt_overfitted)] = max_values
-    
-    # #Re-adjust index
-    # dt_overfitted.rename({dt_overfitted.index[-1]:"Max"},inplace=True)
-    
-    # #Get model Params:
-    # model_params=best_model.get_params()
-    
-    # #write Dataframe to csv
-    # write_output_to_csv(dt_overfitted,output3=model_params,
-    #                     file_name="Overfitted_tree",
-    #                     to_file="DT",shading=shading)
-    # #Get output path
-    # parent_file_path=get_filepath(model_sd="DT",shading=shading)
-    # file_path=parent_file_path+r'\Overfitted_tree'
-    
-    # # Plot and save decision Tree only of last run as example
-    # # With Graphviz
-    # try: 
-    #     dot_data = export_graphviz(best_model, out_file=None, filled=True, rounded=True, special_characters=True)
-    #     graph = graphviz.Source(dot_data)
-    #     graph.render(file_path, format="pdf")  # Save the visualization as a file
-    #     graph.view()  # Display the decision tree in the default viewer    
-    
-    # #With matplotlib if it fails
-    # except Exception as e:
-    #     print("Error occured while rendering with graphviz:",e,"\n\n")
-    #     print("Attempt to render using Matplotlib")       
-    #     file_path+=r'.pdf'
-    #     plt.figure(figsize=(120, 60))  # Set the figure size
-    #     plot_tree(best_model, filled=True, rounded=True)#, feature_names=feature_names, class_names=target_names)  # Plot the decision tree
-    #     plt.savefig(file_path)  # Save the plot to a file
-    
-    
-#run function for testing:
 

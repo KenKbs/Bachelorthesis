@@ -41,6 +41,11 @@ from sklearn.model_selection import GridSearchCV, StratifiedKFold
 #Plots
 import matplotlib.pyplot as plt
 
+try: 
+    import graphviz
+except Exception as e:
+    print("Failed to import graphviz",e)
+
 
 
 #%% General Functions
@@ -58,9 +63,6 @@ def get_filepath(model_sd=False,shading=None):
     #Case 1: Top Results directory -- model_sd=False (not a string)
     parent_directory=os.path.abspath(os.path.join(script_path,os.pardir))
     results_directory = os.path.join(parent_directory,"Results")
-
-
-
 
     
     #Case 2: Subdirectory of Results -- model_sd="LR","NN"..., shading = None
@@ -102,8 +104,7 @@ def get_filepath(model_sd=False,shading=None):
     file_path=results_directory        
             
     return file_path
-    
-    
+        
 
 def get_data():
     """
@@ -752,6 +753,71 @@ def plot_histogram (df,title="Histogram"):
     ax.set_ylim(0,0.9)
     # ax.set_xticklabels(category_labels, rotation=45, ha='right') # change category labels
     return plt
+
+
+def plot_from_dot_file (file_name,file_path=None,to_file=False,shading=None,
+                        output_filename=None,vector_export=True, png_export=False): 
+    """
+    Takes a dot string file and saves it as pdf.
+    Useful, if graphviz does not run from console(because not added
+                                                  to systempath)
+
+    Parameters
+    ----------
+    file_name : str
+        Name of dot-file to read in.
+    file_path : str, optional
+        Explicitly state filepath, else it's generated from
+        to_file and shading. The default is None.
+    to_file : Str, optional
+        Name of Model (LR, DT etc.). The default is False.
+    shading : Bool, optional
+        if True, subfolder shading
+        else subfolder woShading. The default is None.
+    output_filename : str, optional
+        WITHOUT File extension
+        Saves file as pdf, give name of file
+        standard _graphviz is added to filename as output name.
+        The default is None.
+    png_export : bool, optional
+        if True, also exports as .png file
+        might not be readable if too large
+        The default is False.
+    vector_export : bool, optional
+        if True, also exports as .svg file (vector graph)
+        no problems with close readabilty, but not a common format
+        The default is True.
+
+    Returns
+    -------
+    None.
+
+    """
+    
+    #check if output_filename is given
+    if not isinstance(output_filename, str):
+        output_filename=file_name
+        output_filename+='_graphviz'
+    
+    #get Filepath
+    #get-Filepath if not explicitly stated
+    if file_path == None:
+        file_path=get_filepath(model_sd=to_file,shading=shading)
+            
+    #Create source object from DOT format string
+    source = graphviz.Source.from_file(filename=file_name,directory=file_path)
+    
+    if vector_export:
+        # Save graph as SVG (vector)
+        source.render(filename=output_filename,format='svg',cleanup=False)
+    
+    if png_export:
+        # Save graph as PNG
+        source.render(filename=output_filename,format='png',cleanup=False)
+    
+    # Save graph as PDF
+    source.render(filename=output_filename,format='pdf',cleanup=True)
+    
 
 #%% Grid search functions
 def perform_grid_search(x_train,y_train,model,param_grid,k=5):
