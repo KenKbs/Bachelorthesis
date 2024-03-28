@@ -37,22 +37,18 @@ from sklearn.tree import (export_graphviz,
                           plot_tree
                                     )
 
-
 # #Other Imports
 # import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-#try importing graphviz problems, if not correctly installed
+#try importing graphviz; often problems, if not correctly installed
 # command with conda: conda install -c conda-forge pygraphviz
 try:   
     import graphviz
 except Exception as e:
     print("Failed to import module graphviz",e,"\n")
     print("Using Matplotlib")
-
-
-
 
 
 
@@ -102,73 +98,136 @@ x_train, x_test, y_train, y_test = train_test_split_data(data=data,
                                                          scaling=False)
 
 #%% Define Model to tune (Decision Tree)
-rForest=RandomForestClassifier(class_weight=None,
+rForest=RandomForestClassifier(criterion="gini", #CHANGE LATER AFTER RESULTS OF GS
+                              class_weight=None,
                               min_weight_fraction_leaf=0.0,
                               min_impurity_decrease=0.0,
                               max_leaf_nodes=None,
                               min_samples_leaf=1)
 
 #%% Set Parameter to tune 
-
-
-# Criterion
-Criterion=["gini","entropy"] #,"log_loss"] #log loss same as shanon entropy! #Gini usually better!
+"""
+My Thinking:
+    criterion,max_depth, min_samples_split, max_features, ccp_alpha
+    taken from GS DT
     
+    Would also do one Run without pruned tree 
+    max_depth=[None]
+    min_samples_split=[2]
+    max_features=[None]
+    ccp_alpha = 0
+    
+    Left to tune
+    n_estimators default = 100, should do some ranges here not too much, because blows up grids
+    bootstrap True / False 
+    oob_score True / False - out of bag samples to estimate accuracy
+    max_samples - float [0,1] percentage of samples to draw to train each base estimator, when bootstrapping = True
+    random_state = None, not reproduceable - no tuning here
+    
+    
+    Probably going to do two Gridsearch runs and combine them in the end
+    One with pruned decision tree from GS results of DT
+    One without pruned decision trees 
+    --> Just spawn two Gridsearch spaces --> give over two dictonaries in a list!
+    one dictonary, tuning the "pruned" DT
+    second dictonary, tuning the "unpruned" DT
+    and maybe even a third and a fourth for each case with Bootstrapping True and False!
+    
+    Probably span 4 Gridsearch spaces!
+"""
+
+###"Pruned" Values from DT Gridsearch
+
 #max_depth 
 max_depth=[None] #- prevent overfitting, depth of tree
-#Define range to search for (taken from overfitted_tree for both cases)
-max_range=41 if shading else 21 
-max_depth.extend(x for x in range (1,max_range,1))
-    
-#max_leaf_nodes
-# max_leaf_nodes=[None] # maximum number of leaf nodes    
-#append values from 50 to 3050 in 50 steps
-# max_leaf_nodes.extend(x for x in range (500,3001,100))
-    
+   
 #min_samples_split  
 min_samples_split=[2] #minimum number of samples requiered for splitting a node    
-#append values from   
-min_samples_split.extend(x for x in range(3,26,1))
-   
-#min_samples_leaf 
-# min_samples_leaf=[1] # minimum number of samples required in last decision leafs
-# min_samples_leaf.extend(x for x in range(2,26,1))
     
 #max_features
-max_features=[None] # - randomly select x features, from these x features, determine which is best to split and do the splitting    
-#append 1 to 5, because 6 = maxfeatures, this case covered with None
-max_features.extend(x for x in range (1,6,1))    
+max_features=[None] # 
     
 #ccp_alpha 
-ccp_alpha=[0.0] ## minimal cost pruning, after fitting complete prune tree - small alpha values!!!    
-#append 0.005 to 0.501 in 0.005 steps
-ccp_alpha.extend(np.arange(0.005,0.501,0.005))
+ccp_alpha=[0.0]
+
 
 ###ADDITIONAL RF VARIABLES######
-bootstrap=[True] ##look into that, parameters like max_samples depend on that!
-bootstrap.extend(False)
 
-n_estimators=[100] #default
-n_estimators.extend(x for x in range (1,100,5))
-#njobs???? --> should stay at default 1 (single core) to avoid over multi-processing
-#verbose???? --> dunno
-#random_state???? 
-#max_samples??? int,float or None (default)
+#n_estimators - numbers of trees grown
+n_estimators=[] # define empty list
+n_estimators.extend(x for x in range (25,251,25)) # 25 to 250 in 25 steps
 
-#Can we just use the "best parameters" of Gridsearch for DT?
-#Give over parameters to parameter grid to search for
-param_grid={'criterion':Criterion,
-            'max_depth':max_depth,
-            'min_samples_split':min_samples_split,
+#max_samples, proportion of whole dataset used for bootstrapping
+max_samples=[None] #Default, whole sample used for bootstrapping
+max_samples.extend(np.arange(0.1,1.0,0.1)) #increment in 10% steps from 10% to 90% (100% covered with None case)
+
+#oob_score, only useable if bootstrap = True
+oob_score=[False] #False = Default, True makes no sense, because we have a seperate validation set!
+
+#njobs --> should stay at default 1 (single core) to avoid over multi-processing, GS already running on all cores.
+#verbose --> no need to in gridsearch
+
+##Define Grids to search for
+
+#Full Trees without Bootstrap
+param_grid_full_nBS={
+            #'criterion':Criterion,
+            'n_estimators':n_estimators,
+            'max_depth':[None],
+            'min_samples_split':[2],
             # 'min_samples_leaf':min_samples_leaf,
-            'max_features':max_features,
+            'max_features':[None],
             # 'max_leaf_nodes':max_leaf_nodes,
-            'ccp_alpha':ccp_alpha,
-            'bootstrap':bootstrap
+            'ccp_alpha':[0.0],
+            'bootstrap':[False]
             }
 
+#Full Trees with Bootstrap
+param_grid_full_BS={
+            #'criterion':Criterion,
+            'n_estimators':n_estimators,
+            'max_depth':[None],
+            'min_samples_split':[2],
+            # 'min_samples_leaf':min_samples_leaf,
+            'max_features':[None],
+            # 'max_leaf_nodes':max_leaf_nodes,
+            'ccp_alpha':[0.0],
+            'bootstrap':[True],
+            'max_samples':max_samples            
+            }
+
+#Pruned Trees without Bootstrap
+param_grid_pruned_nBS={
+            #'criterion':Criterion,
+            'n_estimators':n_estimators, 
+            'max_depth':[None],
+            'min_samples_split':[2],
+            # 'min_samples_leaf':min_samples_leaf,
+            'max_features':[None],
+            # 'max_leaf_nodes':max_leaf_nodes,
+            'ccp_alpha':[0.0],
+            'bootstrap':[False],       
+            }
+
+#Pruned Trees with Bootstrap
+param_grid_pruned_BS={
+            #'criterion':Criterion,
+            'n_estimators':n_estimators, 
+            'max_depth':[None],
+            'min_samples_split':[2],
+            # 'min_samples_leaf':min_samples_leaf,
+            'max_features':[None],
+            # 'max_leaf_nodes':max_leaf_nodes,
+            'ccp_alpha':[0.0],
+            'bootstrap':[True],
+            'max_samples':max_samples
+            }
+
+#Define whole grid (list of 4 dictonaries)
+param_grid=[param_grid_full_nBS,param_grid_full_BS,
+            param_grid_pruned_nBS,param_grid_pruned_BS]
 #TESTING
-param_grid_t={'criterion':Criterion} #REMOVE LATER AND CHANGE FUNCTION CALL!
+param_grid_t={'criterion':['gini','entropy']} #REMOVE LATER AND CHANGE FUNCTION CALL!
 
 #%%Perform Grid_search
 best_model,cv_results=perform_grid_search(x_train,y_train,rForest,param_grid_t)
