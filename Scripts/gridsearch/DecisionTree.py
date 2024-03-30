@@ -220,9 +220,20 @@ def run_DT_gridsearch(shading=True):
     file_path=parent_file_path+r'\Gridsearch_tree'
     
     # Plot and save decision Tree
+    
+    #Extract feature and class names
+    fn=x_test.columns.tolist()
+    cn=y_test.unique().tolist()
+    cn=sorted(cn)
+
+    #cast into string
+    cn=[str(Float) for Float in cn]
+    
     # With Graphviz
     try: 
-        dot_data = export_graphviz(best_model, out_file=None, filled=True, rounded=True, special_characters=True)
+        dot_data = export_graphviz(best_model, out_file=None, filled=True, 
+                                   rounded=True, special_characters=True,
+                                   feature_names=fn,class_names=cn)
         graph = graphviz.Source(dot_data)
         graph.render(file_path, format="pdf")  # Save the visualization as a file
         graph.view()  # Display the decision tree in the default viewer
@@ -233,7 +244,8 @@ def run_DT_gridsearch(shading=True):
         print("Attempt to render using Matplotlib")       
         file_path+=r'.pdf'
         plt.figure(figsize=(120, 60))  # Set the figure size
-        plot_tree(best_model, filled=True, rounded=True)#, feature_names=feature_names, class_names=target_names)  # Plot the decision tree
+        plot_tree(best_model, filled=True, rounded=True,
+                  feature_names=fn,class_names=cn)#, feature_names=feature_names, class_names=target_names)  # Plot the decision tree
         plt.savefig(file_path)  # Save the plot to a file
     
     """
