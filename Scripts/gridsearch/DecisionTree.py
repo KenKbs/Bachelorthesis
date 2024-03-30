@@ -133,19 +133,36 @@ def run_DT_gridsearch(shading=True):
         
     #ccp_alpha 
     ccp_alpha=[0.0] ## minimal cost pruning, after fitting complete prune tree - small alpha values!!!    
-    #append 0.005 to 0.501 in 0.005 steps
-    ccp_alpha.extend(np.arange(0.005,0.501,0.005))
+    #append 0.005 to 1.000 in 0.005 steps
+    ccp_alpha.extend(np.arange(0.005,1.001,0.005))
     
-        
+    
     #Give over parameters to parameter grid to search for
-    param_grid={'criterion':Criterion,
+    
+    #Exclude CCP, alpha, limit leafs during training
+    param_grid_pre_prun={
+                'criterion':Criterion,
                 'max_depth':max_depth,
                 'min_samples_split':min_samples_split,
                 # 'min_samples_leaf':min_samples_leaf,
                 'max_features':max_features,
                 # 'max_leaf_nodes':max_leaf_nodes,
+                'ccp_alpha':[0.0]
+                }
+    
+    #Only CCP-alpha (post-pruning)
+    param_grid_post_prun={
+                'criterion':Criterion,
+                'max_depth':[None],
+                'min_samples_split':[2],
+                # 'min_samples_leaf':min_samples_leaf,
+                'max_features':[None],
+                # 'max_leaf_nodes':max_leaf_nodes,
                 'ccp_alpha':ccp_alpha
                 }
+    
+    #Combine both Grids to list
+    param_grid=[param_grid_pre_prun,param_grid_post_prun]
     
     #TESTING
     #param_grid_t={'criterion':Criterion} #REMOVE LATER AND CHANGE FUNCTION CALL!
