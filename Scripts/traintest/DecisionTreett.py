@@ -157,11 +157,11 @@ def run_DT_traintest(shading=True,num_iterations=100):
                           title=f"TestTrain ConfusionMatrix DT shading {shading}")
          
     #save (absolute) confusion matrix to file:
-    save_object_to_file(cm_all,file_name="TestTrain_CM_DT",
+    save_object_to_file(cm_all,file_name="TestTrain_CM",
                         to_file="DT",shading=shading)
     
     #save (aggregated) report (f1_score etc.) to file:
-    save_object_to_file(report_all,file_name="TestTrain_report_DT",
+    save_object_to_file(report_all,file_name="TestTrain_report",
                         to_file="DT",shading=shading)
     
     #Print result

@@ -31,8 +31,8 @@ if __name__ == "__main__":
     #Decision Tree
     #DT.overfit_DT(shading=True,runs=100)
     #DT.overfit_DT(shading=False,runs=100)
-    DT.run_DT_gridsearch(shading=True)
-    # DT.run_DT_gridsearch(shading=False)
+    # DT.run_DT_gridsearch(shading=True)
+    DT.run_DT_gridsearch(shading=False)
     
     #DT.overfit_DT(shading=False,runs=100)
     #DT.run_DT_gridsearch(shading=False)
@@ -46,12 +46,12 @@ if __name__ == "__main__":
     #%%Run Test-split repeaditly
     
     #Logistic Regression
-    TTLR.run_LR_traintest(shading=True,num_iterations=100)
-    TTLR.run_LR_traintest(shading=False,num_iterations=100)
+    # TTLR.run_LR_traintest(shading=True,num_iterations=100)
+    # TTLR.run_LR_traintest(shading=False,num_iterations=100)
     
     #Decsion Tree train-test
-    TTDT.run_DT_traintest(shading=True,num_iterations=100)
-    TTDT.run_DT_traintest(shdaing=False,num_iterations=100)
+    # TTDT.run_DT_traintest(shading=True,num_iterations=100)
+    TTDT.run_DT_traintest(shading=False,num_iterations=100)
     
     #Testing for DOT export
     # UT.plot_from_dot_file("Overfitted_tree", shading=True, to_file="DT",#file_path=r'C:\Users\Kenny\Dropbox\Education\Uni\FU-Berlin\Inhalte\9. Semester\Bachelorarbeit\Programmierung\GitHub-Repo\Bachelorthesis\Results\DT\Shading',
