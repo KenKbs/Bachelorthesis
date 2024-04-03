@@ -6,7 +6,6 @@ Created on Mon Mar 11 10:44:10 2024
 """
 
 # %% Imports
-# Main package imports done in util.py
 
 # Internal imports
 from Scripts.util import (
@@ -20,13 +19,12 @@ from Scripts.util import (
     plot_confusion_matrix,
     write_output_to_csv,
     save_object_to_file,
-    load_object_from_file,  # REMOVE LATER!
     get_filepath
 )
 
 # SK-learn model imports
-from sklearn.ensemble import (RandomForestClassifier
-                              )
+from sklearn.ensemble import RandomForestClassifier
+                              
 from sklearn.tree import (export_graphviz,
                           plot_tree
                           )
@@ -94,7 +92,8 @@ def run_RF_gridsearch(shading=True):
                                      min_weight_fraction_leaf=0.0,
                                      min_impurity_decrease=0.0,
                                      max_leaf_nodes=None,
-                                     min_samples_leaf=1)
+                                     min_samples_leaf=1,
+                                     oob_score=False)
     
     # %% Set Parameter to tune
     """
@@ -154,9 +153,6 @@ def run_RF_gridsearch(shading=True):
     # increment in 10% steps from 10% to 90% (100% covered with None case)
     max_samples.extend(np.arange(0.1, 1.0, 0.1))
     
-    # oob_score, only useable if bootstrap = True
-    # False = Default, True makes no sense, because we have a seperate validation set!
-    oob_score = [False]
     
     # njobs --> should stay at default 1 (single core) to avoid over multi-processing, GS already running on all cores.
     # verbose --> no need for extra output in gridsearch
@@ -166,26 +162,20 @@ def run_RF_gridsearch(shading=True):
     
     # Full Trees without Bootstrap
     param_grid_full_nBS = {
-        # 'criterion':Criterion,
         'n_estimators': n_estimators,
         'max_depth': [None],
         'min_samples_split': [2],
-        # 'min_samples_leaf':min_samples_leaf,
         'max_features': [None],
-        # 'max_leaf_nodes':max_leaf_nodes,
         'ccp_alpha': [0.0],
         'bootstrap': [False]
     }
     
     # Full Trees with Bootstrap
     param_grid_full_BS = {
-        # 'criterion':Criterion,
         'n_estimators': n_estimators,
         'max_depth': [None],
         'min_samples_split': [2],
-        # 'min_samples_leaf':min_samples_leaf,
         'max_features': [None],
-        # 'max_leaf_nodes':max_leaf_nodes,
         'ccp_alpha': [0.0],
         'bootstrap': [True],
         'max_samples': max_samples
@@ -193,26 +183,20 @@ def run_RF_gridsearch(shading=True):
     
     # Pruned Trees without Bootstrap
     param_grid_pruned_nBS = {
-        # 'criterion':Criterion,
         'n_estimators': n_estimators,
         'max_depth': max_depth,
         'min_samples_split': min_samples_split,
-        # 'min_samples_leaf':min_samples_leaf,
         'max_features': max_features,
-        # 'max_leaf_nodes':max_leaf_nodes,
         'ccp_alpha': ccp_alpha,
         'bootstrap': [False],
     }
     
     # Pruned Trees with Bootstrap
     param_grid_pruned_BS = {
-        # 'criterion':Criterion,
         'n_estimators': n_estimators,
         'max_depth': max_depth,
         'min_samples_split': min_samples_split,
-        # 'min_samples_leaf':min_samples_leaf,
         'max_features': max_features,
-        # 'max_leaf_nodes':max_leaf_nodes,
         'ccp_alpha': ccp_alpha,
         'bootstrap': [True],
         'max_samples': max_samples
@@ -223,11 +207,11 @@ def run_RF_gridsearch(shading=True):
                   param_grid_pruned_nBS, param_grid_pruned_BS]
     # TESTING
     # REMOVE LATER AND CHANGE FUNCTION CALL!
-    param_grid_t = {'criterion': ['gini', 'entropy']}
+    # param_grid_t = {'criterion': ['gini', 'entropy']}
     
     # %%Perform Grid_search
     best_model, cv_results = perform_grid_search(
-        x_train, y_train, rForest, param_grid_t)
+        x_train, y_train, rForest, param_grid)
     
     # Get best_model parameters
     best_model_params = best_model.get_params()
