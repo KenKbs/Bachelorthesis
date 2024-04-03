@@ -236,6 +236,7 @@ def run_DT_gridsearch(shading=True):
                                    feature_names=fn,class_names=cn)
         graph = graphviz.Source(dot_data)
         graph.render(file_path, format="pdf")  # Save the visualization as a file
+        graph.render(file_path,format="svg") # Save visualisation as Vector
         graph.view()  # Display the decision tree in the default viewer
     
     #if Error, render with matplotlib
@@ -380,6 +381,7 @@ def overfit_DT (shading=True,runs=100):
         dot_data = export_graphviz(best_model, out_file=None, filled=True, rounded=True, special_characters=True)
         graph = graphviz.Source(dot_data)
         graph.render(file_path, format="pdf")  # Save the visualization as a file
+        graph.render(file_path,format="svg") # Save visualization as vector
         graph.view()  # Display the decision tree in the default viewer    
     
     #With matplotlib if it fails
