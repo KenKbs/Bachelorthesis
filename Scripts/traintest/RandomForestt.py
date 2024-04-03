@@ -20,11 +20,13 @@ from Scripts.util import (
     save_object_to_file,
     convert_to_srow)
 
+
+
 #%% main function
 def run_RF_traintest(shading=True,num_iterations=100):
     """
-    Repeaditly trains and tests DT model and saves
-    results to "DT" directory.
+    Repeaditly trains and tests best RF model and saves
+    results to "RF" directory.
     
     Parameters
     ----------
@@ -57,7 +59,7 @@ def run_RF_traintest(shading=True,num_iterations=100):
     data=filter_data(raw_data,filter_value=100,shading=shading)
     
     #Print out fault distribution before and after filtering
-        #Include shading cases
+    #Include shading cases
     if shading:
         generate_table(raw_data,data,"Raw","Filtered")
     #Exclude shading casees
@@ -65,16 +67,16 @@ def run_RF_traintest(shading=True,num_iterations=100):
         generate_table(raw_data,data,"Raw","Shad. excl")
                 
     #Load DT model with pickle
-    decision_tree=load_object_from_file("Best_Model_DT.pk1",
-                                 to_file="DT",shading=shading)
+    random_forest=load_object_from_file("Best_Model_RF.pk1",
+                                 to_file="RF",shading=shading)
     
     #load report (from Gridsearch) as "starting" value
-    report_all=load_object_from_file("Grid-search_report_DT.pk1",
-                                         to_file="DT",shading=shading)
+    report_all=load_object_from_file("Grid-search_report_RF.pk1",
+                                         to_file="RF",shading=shading)
     
     #load confusion matrix (from gridserach)
-    cm_all=load_object_from_file("Grid-search_CM_DT.pk1",
-                                         to_file="DT",shading=shading)
+    cm_all=load_object_from_file("Grid-search_CM_RF.pk1",
+                                         to_file="RF",shading=shading)
     
     
     #%%Initialize csv-file
@@ -87,9 +89,9 @@ def run_RF_traintest(shading=True,num_iterations=100):
     row_labels=convert_to_srow(df=report_all,insert_value='run_counter',
                                extract_labels=True)
     
-    #Get file_path
-    parent_file_path=get_filepath(model_sd="DT",shading=shading)
-    file_path=parent_file_path+r'\Test-train-results_DT.csv'
+    #Get file_path and attach filename
+    parent_file_path=get_filepath(model_sd="RF",shading=shading)
+    file_path=parent_file_path+r'\Test-train-results_RF.csv'
     
     #Intialize csv_file with first row of report_all (results from gridsearch)
     #Open file outside loop once and close after loop
@@ -110,11 +112,11 @@ def run_RF_traintest(shading=True,num_iterations=100):
                                                                      test_size=0.2,
                                                                      scaling=False)  #no z-transformation anymore  
             #Refit to new data
-            decision_tree.fit(x_train,y_train)
+            random_forest.fit(x_train,y_train)
                 
             #Evaluation and Result manipulation    
             #Predict classes
-            y_pred=decision_tree.predict(x_test)
+            y_pred=random_forest.predict(x_test)
             
             #Get f1,recall,precision etc.as DF
             report_tt=get_performance_metrics(y_test, y_pred)
@@ -147,22 +149,22 @@ def run_RF_traintest(shading=True,num_iterations=100):
     #%% Save aggregated Results to file / pdf
     
     #Write aggregated report, cm etc. to seperate csv_file
-    params=decision_tree.get_params() #get params of model
-    write_output_to_csv(report_all.round(4),cm_all,params,file_name="Test-train-aggregated-results_DT",
-                        to_file="DT",shading=shading)
+    params=random_forest.get_params() #get params of model
+    write_output_to_csv(report_all.round(4),cm_all,params,file_name="Test-train-aggregated-results_RF",
+                        to_file="RF",shading=shading)
       
     #plot Confusion Matrix and save to pdf
-    plot_confusion_matrix(cm_all,to_file="DT",show_plot=False,normalize=True,
+    plot_confusion_matrix(cm_all,to_file="RF",show_plot=False,normalize=True,
                           shading=shading,
-                          title=f"TestTrain ConfusionMatrix DT shading {shading}")
+                          title=f"TestTrain ConfusionMatrix RF shading {shading}")
          
     #save (absolute) confusion matrix to file:
     save_object_to_file(cm_all,file_name="TestTrain_CM",
-                        to_file="DT",shading=shading)
+                        to_file="RF",shading=shading)
     
     #save (aggregated) report (f1_score etc.) to file:
     save_object_to_file(report_all,file_name="TestTrain_report",
-                        to_file="DT",shading=shading)
+                        to_file="RF",shading=shading)
     
     #Print result
     print(f'All data has been sucessfully written to files \nSee Filepath:\n {parent_file_path}')

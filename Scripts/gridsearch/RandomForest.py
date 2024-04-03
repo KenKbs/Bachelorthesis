@@ -137,10 +137,10 @@ def run_RF_gridsearch(shading=True):
         ccp_alpha = [0.0]
     
     else: #Values for shading = False from DT GS
-        max_depth = []
-        min_samples_split = []
-        max_features = []
-        ccp_alpha = []
+        max_depth = [16]
+        min_samples_split = [2]
+        max_features = [5]
+        ccp_alpha = [0.0]
     
     
     ### ADDITIONAL RF VARIABLES######
@@ -293,7 +293,8 @@ def run_RF_gridsearch(shading=True):
                                    rounded=True, special_characters=True,
                                    feature_names=fn, class_names=cn)
         graph = graphviz.Source(dot_data)
-        graph.render(file_path, format="pdf")  # Save the visualization as a file
+        graph.render(file_path, format="pdf")# Save the visualization as pdf file
+        graph.render(file_path,format="svg") # Save visualization as vector graphic
         graph.view()  # Display the decision tree in the default viewer
     
     # if Error, render with matplotlib, first tree of forest
