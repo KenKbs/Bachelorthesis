@@ -42,6 +42,9 @@ except Exception as e:
     print("Failed to import module graphviz", e, "\n")
     print("Using Matplotlib")
 
+#bug-fix -Memory overflow - also does not work here without it
+from joblib.parallel import parallel_config # requires joblib 1.3 or higher
+
 
 # %% Gridsearch
 def run_RF_gridsearch(shading=True):
@@ -210,8 +213,9 @@ def run_RF_gridsearch(shading=True):
     # param_grid_t = {'criterion': ['gini', 'entropy']}
     
     # %%Perform Grid_search
-    best_model, cv_results = perform_grid_search(
-        x_train, y_train, rForest, param_grid)
+    with parallel_config(temp_folder='/temp',max_nbytes='4M'): #Change temporary folder to where space is (C:/temp) and maxbytes to 4 to avoid memory explosion
+        best_model, cv_results = perform_grid_search(
+                                 x_train, y_train, rForest, param_grid)
     
     # Get best_model parameters
     best_model_params = best_model.get_params()
