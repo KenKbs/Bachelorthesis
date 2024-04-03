@@ -149,7 +149,7 @@ def run_RF_gridsearch(shading=True):
     
     # n_estimators - numbers of trees grown
     n_estimators = []  # define empty list
-    n_estimators.extend(x for x in range(25, 501, 25))  # 25 to 500 in 25 steps
+    n_estimators.extend(x for x in range(25, 251, 25))  # 25 to 250 in 25 steps
     
     # max_samples, proportion of whole dataset used for bootstrapping
     max_samples = [None]  # Default, whole sample used for bootstrapping
