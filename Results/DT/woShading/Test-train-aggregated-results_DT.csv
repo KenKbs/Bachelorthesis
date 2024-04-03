@@ -1,0 +1,18 @@
+index;precision;recall;f1-score;support
+0.0;0.9999;0.9999;0.9999;61851.0
+1.0;0.9983;0.9981;0.9982;1200.0
+2.0;0.9972;0.997;0.9971;2074.0
+3.0;0.9992;0.9993;0.9992;1205.0
+macro avg;0.9987;0.9986;0.9986;66330.0
+weighted avg;0.9998;0.9998;0.9998;66330.0
+
+ 
+;0;1;2;3
+0;6184708;61;331;0
+1;66;119767;167;0
+2;395;140;206768;97
+3;1;0;85;120414
+
+ 
+ccp_alpha;class_weight;criterion;max_depth;max_features;max_leaf_nodes;min_impurity_decrease;min_samples_leaf;min_samples_split;min_weight_fraction_leaf;monotonic_cst;random_state;splitter
+0.0;;entropy;16;5;;0.0;1;2;0.0;;;best
