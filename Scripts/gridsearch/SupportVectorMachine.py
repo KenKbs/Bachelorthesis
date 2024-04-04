@@ -23,24 +23,21 @@ from Scripts.util import (
 )
 
 # SK-learn model imports
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
                               
-from sklearn.tree import (export_graphviz,
-                          plot_tree
-                          )
 
 # #Other Imports
 # import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# try importing graphviz; often problems, if not correctly installed
-# command with conda: conda install -c conda-forge pygraphviz
-try:
-    import graphviz
-except Exception as e:
-    print("Failed to import module graphviz", e, "\n")
-    print("Using Matplotlib")
+# # try importing graphviz; often problems, if not correctly installed
+# # command with conda: conda install -c conda-forge pygraphviz
+# try:
+#     import graphviz
+# except Exception as e:
+#     print("Failed to import module graphviz", e, "\n")
+#     print("Using Matplotlib")
 
 #bug-fix -Memory overflow - also does not work here without it
 from joblib.parallel import parallel_config # requires joblib 1.3 or higher
@@ -88,138 +85,105 @@ else:
 
 # Grid search preparations
 
+
+
 # Split data w. own fuinction, scaling = False
 x_train, x_test, y_train, y_test = train_test_split_data(data=data,
                                                          test_size=0.2,
-                                                         scaling=False)
+                                                         scaling=False)#???
 
-# %% Define Model to tune (Decision Tree)
-rForest = RandomForestClassifier(criterion="entropy",  # CHANGE LATER AFTER RESULTS OF GS
-                                 class_weight=None,
-                                 min_weight_fraction_leaf=0.0,
-                                 min_impurity_decrease=0.0,
-                                 max_leaf_nodes=None,
-                                 min_samples_leaf=1,
-                                 oob_score=False)
+# %% Define Model to tune (SVM)
+support_vm=SVC(cache_size=500, 
+              shrinking=False,
+              decision_function_shape="ovr",
+              break_ties=False)#?
+
 
 # %% Set Parameter to tune
 """
 My Thinking:
-    criterion,max_depth, min_samples_split, max_features, ccp_alpha
-    taken from GS DT
     
-    Would also do runs without pruned tree 
-    max_depth=[None]
-    min_samples_split=[2]
-    max_features=[None]
-    ccp_alpha = 0
-    oob_score False - out of bag samples to estimate accuracy useless,
-    because we have seperate test sample
+    Fixed things:
+        decision function shape (ovr / ovo)
+            Only apply ovr approach, because ono approach not recommended 
+            and bloats grid
+        break_ties=False, because costly if enabled still do not know how useful that is...
+        
+        
+        
+        
+    Need to define:
+        Kernel function
+        C
+        gamma (for 'rbf', 'poly', and 'sigmoid', float, non-negative)
+        
+        coef0, (independent term) only for poly and sigmoid
+        
+        degree, for poly, degree of polynomial
+        
     
-    Left to tune
-    n_estimators default = 100, should do some ranges here not too much, 
-    because blows up grids
-    bootstrap True / False 
-    max_samples - float [0,1] percentage of samples to draw to train each base 
-    estimator, when bootstrapping = True
-    random_state = None, not reproduceable - no tuning here
     
-    
-    Doing 4 Gridsearch spaces
-    Bootstrap on and off and Pruned / Unpruned trees, 
-    total of 4 Grids to search for!
-    
-    Also account for different values for shading / noshading
     
 """
 
-# "Pruned" Values from DT Gridsearch
+#General parameters (in every kernel)
 
-#Values if shading Included (with shading class)
-if shading:
-    max_depth = [19]
-    min_samples_split = [4]
-    max_features = [5]
-    ccp_alpha = [0.0]
+#Penalization_term c
+penalization_parameter=[0.000001,0.00001,0.0001,0.001,0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,
+                    0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,
+                    0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,
+                    1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,
+                    10,15,20,25,30,35,40,45,50,60,70,80,90,
+                    100,200,300,400,500,600,700,800,900,
+                    1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,
+                    3000,3250,3500,3750,4000,4250,4500,4750,
+                    5000,5500,6000,6500,7000,7500,8000,8500,9000,9500,10000,
+                    12500,15000,17500,20000,22500,25000,27500,30000,
+                    40000,50000,60000,70000,80000,90000,100000,
+                    200000,300000,400000,500000,600000,700000,800000,900000,
+                    1000000] #Probably need a smaller grid for c...
+#Gamma
+gamma=['scale','auto']
 
-else: #Values for shading = False from DT GS
-    max_depth = [16]
-    min_samples_split = [2]
-    max_features = [5]
-    ccp_alpha = [0.0]
+#coef0
+coef0=[0.0] #default should be flaot, independent term
 
-
-### ADDITIONAL RF VARIABLES######
-
-# n_estimators - numbers of trees grown
-n_estimators = []  # define empty list
-n_estimators.extend(x for x in range(25, 251, 25))  # 25 to 250 in 25 steps
-
-# max_samples, proportion of whole dataset used for bootstrapping
-max_samples = [None]  # Default, whole sample used for bootstrapping
-# increment in 10% steps from 10% to 90% (100% covered with None case)
-max_samples.extend(np.arange(0.1, 1.0, 0.1))
-
-
-# njobs --> should stay at default 1 (single core) to avoid over multi-processing, GS already running on all cores.
-# verbose --> no need for extra output in gridsearch
+#degree of polynomial
+degree=[2]
+degree.extend(pol for pol in range (3,101)) #polynomials bis zum einhunderten Grad mit einbeziehen
 
 
-# Define Grids to search for
+#Radial Basis Function (infinte dimensions)
+rbf_kernel={'C':penalization_parameter,
+            'kernel':['rbf'],
+            'gamma':gamma
+            }
 
-# Full Trees without Bootstrap
-param_grid_full_nBS = {
-    'n_estimators': n_estimators,
-    'max_depth': [None],
-    'min_samples_split': [2],
-    'max_features': [None],
-    'ccp_alpha': [0.0],
-    'bootstrap': [False]
-}
+#polynomial function
+poly_kernel={'C':penalization_parameter,
+             'kernel':['poly'],
+             'gamma':gamma,
+             'coef0':coef0,
+             'degree':degree             
+             }
 
-# Full Trees with Bootstrap
-param_grid_full_BS = {
-    'n_estimators': n_estimators,
-    'max_depth': [None],
-    'min_samples_split': [2],
-    'max_features': [None],
-    'ccp_alpha': [0.0],
-    'bootstrap': [True],
-    'max_samples': max_samples
-}
+#linear function
+linear_kernel={'C':penalization_parameter,
+               'kernel':['linear'],
+               }
 
-# Pruned Trees without Bootstrap
-param_grid_pruned_nBS = {
-    'n_estimators': n_estimators,
-    'max_depth': max_depth,
-    'min_samples_split': min_samples_split,
-    'max_features': max_features,
-    'ccp_alpha': ccp_alpha,
-    'bootstrap': [False],
-}
-
-# Pruned Trees with Bootstrap
-param_grid_pruned_BS = {
-    'n_estimators': n_estimators,
-    'max_depth': max_depth,
-    'min_samples_split': min_samples_split,
-    'max_features': max_features,
-    'ccp_alpha': ccp_alpha,
-    'bootstrap': [True],
-    'max_samples': max_samples
-}
 
 # Define whole grid (list of 4 dictonaries)
-param_grid = [param_grid_full_nBS, param_grid_full_BS,
-              param_grid_pruned_nBS, param_grid_pruned_BS]
+param_grid = [rbf_kernel, poly_kernel,linear_kernel]
+
 # TESTING
 # REMOVE LATER AND CHANGE FUNCTION CALL!
-# param_grid_t = {'criterion': ['gini', 'entropy']}
+param_grid_t = {'C': [1, 0.01,2]}
 
 # %%Perform Grid_search
 with parallel_config(temp_folder='/temp',max_nbytes='4M'): #Change temporary folder to where space is (C:/temp) and maxbytes to 4 to avoid memory explosion
     best_model, cv_results = perform_grid_search(
-                             x_train, y_train, rForest, param_grid)
+                             x_train, y_train, support_vm, param_grid_t)
 
 # Get best_model parameters
 best_model_params = best_model.get_params()
@@ -243,64 +207,30 @@ cm = get_confusion_matrix(y_test, y_pred_best, normalize=False)
 # %% Save Results to file / csv
 
 # plot Confusion Matrix and save to file
-plot_confusion_matrix(cm, to_file="RF", show_plot=False, normalize=True,
+plot_confusion_matrix(cm, to_file="SVM", show_plot=False, normalize=True,
                       shading=shading,
-                      title=f"Grid-search ConfusionMatrix RF shading {shading}")
+                      title=f"Grid-search ConfusionMatrix SVM shading {shading}")
 
 # save best model to file
 save_object_to_file(best_model, file_name="Best_Model",
-                    to_file="RF", shading=shading)
+                    to_file="SVM", shading=shading)
 
 # save confusion matrix to file:
 save_object_to_file(cm, file_name="Grid-search_CM",
-                    to_file="RF", shading=shading)
+                    to_file="SVM", shading=shading)
 
 # save report (f1_score etc.) to file:
 save_object_to_file(report, file_name="Grid-search_report",
-                    to_file="RF", shading=shading)
+                    to_file="SVM", shading=shading)
 
 # Save Grid-search results to csv_file
 write_output_to_csv(cv_results, output2=report.round(4),  # take rounded numbers of report for better overview
                     output3=best_model_params,
-                    file_name="Grid-search-results_RF",
-                    to_file="RF", shading=shading)
+                    file_name="Grid-search-results_SVM",
+                    to_file="SVM", shading=shading)
 
 # Get output path
-parent_file_path = get_filepath(model_sd="RF", shading=shading)
-file_path = parent_file_path+r'\Gridsearch_RF'
+parent_file_path = get_filepath(model_sd="SVM", shading=shading)
+file_path = parent_file_path+r'\Gridsearch_SVM'
 
-# %% Plot and save decision Tree
 
-# Extract feature and class names
-fn = x_test.columns.tolist()
-cn = y_test.unique().tolist()
-cn = sorted(cn)
-
-# cast class names into string
-cn = [str(Float) for Float in cn]
-
-# Plot one Tree of RF
-try:
-    dot_data = export_graphviz(best_model.estimators_[0], out_file=None, filled=True,
-                               rounded=True, special_characters=True,
-                               feature_names=fn, class_names=cn)
-    graph = graphviz.Source(dot_data)
-    graph.render(file_path, format="pdf")# Save the visualization as pdf file
-    graph.render(file_path,format="svg") # Save visualization as vector graphic
-    graph.view()  # Display the decision tree in the default viewer
-
-# if Error, render with matplotlib, first tree of forest
-except Exception as e:
-    print("Error occured while rendering with graphviz:", e, "\n\n")
-    print("Attempt to render using Matplotlib")
-    file_path += r'.pdf'
-    fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(150, 50), dpi=200)
-    plot_tree(best_model.estimators_[0], feature_names=fn,
-              class_names=cn, filled=True)
-    plt.savefig(file_path)  # Save the plot to pdf-file
-
-"""
-graphviz does not work from console, if not added to system path
-because adding to system path is kinda inconvenient, did a try except statement
-with a different visualisation tool.
-"""

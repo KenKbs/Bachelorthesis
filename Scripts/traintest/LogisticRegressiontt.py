@@ -160,3 +160,5 @@ def run_LR_traintest(shading=True,num_iterations=100):
     #Print result
     print(f'All data has been sucessfully written to files \nSee Filepath:\n {parent_file_path}')
     
+    
+run_LR_traintest(num_iterations=5)
