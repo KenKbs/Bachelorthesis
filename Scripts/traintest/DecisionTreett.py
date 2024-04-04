@@ -75,8 +75,7 @@ def run_DT_traintest(shading=True,num_iterations=100):
     #load confusion matrix (from gridserach)
     cm_all=load_object_from_file("Grid-search_CM_DT.pk1",
                                          to_file="DT",shading=shading)
-    
-    
+        
     #%%Initialize csv-file
     #Manipulate report_all to prepare for writing to csv:
         
@@ -90,6 +89,9 @@ def run_DT_traintest(shading=True,num_iterations=100):
     #Get file_path
     parent_file_path=get_filepath(model_sd="DT",shading=shading)
     file_path=parent_file_path+r'\Test-train-results_DT.csv'
+    
+    #Choose columns to average for the report
+    ctavg=['precision','recall','f1-score'] 
     
     #Intialize csv_file with first row of report_all (results from gridsearch)
     #Open file outside loop once and close after loop
@@ -129,11 +131,15 @@ def run_DT_traintest(shading=True,num_iterations=100):
             file.write(';'.join(map(str,single_row))+'\n')
             
             #Combine Dataframes for aggregated results
-            #report - incremental average approach due to memory
-            report_all=report_all+((report_tt-report_all)/run)
             """
             u_n=u_n-1+(x_n-u_n-1)/n
             """
+            #report - incremental average approach due to memory for f1-score, precision and recall
+            report_all[ctavg]=report_all[ctavg]+((report_tt[ctavg]-report_all[ctavg])/run)
+            
+            #report - add up support column (number of cases)
+            report_all['support']=report_all['support']+report_tt['support']
+
             
             #Add up Confusion Matrix
             cm_all=cm_all+cm_tt

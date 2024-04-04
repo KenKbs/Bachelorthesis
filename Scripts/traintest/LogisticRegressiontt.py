@@ -34,11 +34,11 @@ def run_LR_traintest(shading=True,num_iterations=100):
         The default is 100.
         note: the first "run" is always the result from the gridsearch
         so if value = 100 --> 99 runs from repeaditly train/test, one from GS
-
+    
     Returns
     -------
     None.
-
+    
     """
     #Initialize starting values
     num_iterations -=1 #For conviniance reasons, results of gridsearch = first "run"    
@@ -69,7 +69,7 @@ def run_LR_traintest(shading=True,num_iterations=100):
     #load report (from Gridsearch) as "starting" value
     report_all=load_object_from_file("Grid-search_report_LR.pk1",
                                          to_file="LR",shading=shading)
-
+    
     #load confusion matrix (from gridserach)
     cm_all=load_object_from_file("Grid-search_CM_LR.pk1",
                                          to_file="LR",shading=shading)
@@ -87,6 +87,9 @@ def run_LR_traintest(shading=True,num_iterations=100):
     #Get file_path
     parent_file_path=get_filepath(model_sd="LR",shading=shading)
     file_path=parent_file_path+r'\Test-train-results_LR.csv'
+    
+    #Choose columns to average for the report
+    ctavg=['precision','recall','f1-score'] 
     
     #Intialize csv_file with first row of report_all (results from gridsearch)
     #Open file outside loop once and close after loop
@@ -125,8 +128,11 @@ def run_LR_traintest(shading=True,num_iterations=100):
             file.write(';'.join(map(str,single_row))+'\n')
             
             #Combine Dataframes for aggregated results
-            #report - incremental average approach due to memory
-            report_all=report_all+((report_tt-report_all)/run)
+            #report - incremental average approach due to memory for f1-score, precision and recall
+            report_all[ctavg]=report_all[ctavg]+((report_tt[ctavg]-report_all[ctavg])/run)
+            
+            #report - add up support column (number of cases)
+            report_all['support']=report_all['support']+report_tt['support']
             
             #Add up Confusion Matrix
             cm_all=cm_all+cm_tt
@@ -159,6 +165,5 @@ def run_LR_traintest(shading=True,num_iterations=100):
     
     #Print result
     print(f'All data has been sucessfully written to files \nSee Filepath:\n {parent_file_path}')
+
     
-    
-run_LR_traintest(num_iterations=5)
