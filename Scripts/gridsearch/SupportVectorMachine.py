@@ -7,6 +7,7 @@ Created on Mon Mar 11 10:44:10 2024
 
 # %% Imports
 
+
 # Internal imports
 from Scripts.util import (
     get_data,
@@ -178,7 +179,7 @@ param_grid = [rbf_kernel, poly_kernel,linear_kernel]
 
 # TESTING
 # REMOVE LATER AND CHANGE FUNCTION CALL!
-param_grid_t = {'C': [1, 0.01,2]}
+param_grid_t = {'C': [1, 0.01]}
 
 # %%Perform Grid_search
 with parallel_config(temp_folder='/temp',max_nbytes='4M'): #Change temporary folder to where space is (C:/temp) and maxbytes to 4 to avoid memory explosion
