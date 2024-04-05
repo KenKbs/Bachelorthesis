@@ -23,10 +23,10 @@ from Scripts.util import (
 
 
 #%% main function
-def run_RF_traintest(shading=True,num_iterations=100):
+def run_SVM_traintest(shading=True,num_iterations=100):
     """
-    Repeaditly trains and tests best RF model and saves
-    results to "RF" directory.
+    Repeaditly trains and tests best SVM model and saves
+    results to "SVM" directory.
     
     Parameters
     ----------
@@ -66,7 +66,7 @@ def run_RF_traintest(shading=True,num_iterations=100):
     else:
         generate_table(raw_data,data,"Raw","Shad. excl")
                 
-    #Load DT model with pickle
+    #Load SVM model with pickle
     support_vm=load_object_from_file("Best_Model_SVM.pk1",
                                  to_file="SVM",shading=shading)
     
@@ -90,7 +90,7 @@ def run_RF_traintest(shading=True,num_iterations=100):
                                extract_labels=True)
     
     #Get file_path and attach filename
-    parent_file_path=get_filepath(model_sd="RF",shading=shading)
+    parent_file_path=get_filepath(model_sd="SVM",shading=shading)
     file_path=parent_file_path+r'\Test-train-results_SVM.csv'
     
     #Choose columns to average for the report

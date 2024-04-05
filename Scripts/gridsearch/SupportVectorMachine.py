@@ -47,8 +47,8 @@ from joblib.parallel import parallel_config # requires joblib 1.3 or higher
 # %% Gridsearch
 def run_SVM_gridsearch(shading=True):
     """
-    Runs Gridsearch for RandomForest and writes the best results
-    to directory Results/RF
+    Runs Gridsearch for SupportVectorMachine and writes the best results
+    to directory Results/SVM
 
     Parameters
     ----------

@@ -23,10 +23,10 @@ from Scripts.util import (
 
 
 #%% main function
-def run_RF_traintest(shading=True,num_iterations=100):
+def run_NN_traintest(shading=True,num_iterations=100):
     """
-    Repeaditly trains and tests best RF model and saves
-    results to "RF" directory.
+    Repeaditly trains and tests best NN model and saves
+    results to "NN" directory.
     
     Parameters
     ----------
@@ -66,17 +66,17 @@ def run_RF_traintest(shading=True,num_iterations=100):
     else:
         generate_table(raw_data,data,"Raw","Shad. excl")
                 
-    #Load RF model with pickle
-    random_forest=load_object_from_file("Best_Model_RF.pk1",
-                                 to_file="RF",shading=shading)
+    #Load NN model with pickle
+    neural_network=load_object_from_file("Best_Model_NN.pk1",
+                                 to_file="NN",shading=shading)
     
     #load report (from Gridsearch) as "starting" value
-    report_all=load_object_from_file("Grid-search_report_RF.pk1",
-                                         to_file="RF",shading=shading)
+    report_all=load_object_from_file("Grid-search_report_NN.pk1",
+                                         to_file="NN",shading=shading)
     
     #load confusion matrix (from gridserach)
-    cm_all=load_object_from_file("Grid-search_CM_RF.pk1",
-                                         to_file="RF",shading=shading)
+    cm_all=load_object_from_file("Grid-search_CM_NN.pk1",
+                                         to_file="NN",shading=shading)
     
     
     #%%Initialize csv-file
@@ -90,8 +90,8 @@ def run_RF_traintest(shading=True,num_iterations=100):
                                extract_labels=True)
     
     #Get file_path and attach filename
-    parent_file_path=get_filepath(model_sd="RF",shading=shading)
-    file_path=parent_file_path+r'\Test-train-results_RF.csv'
+    parent_file_path=get_filepath(model_sd="NN",shading=shading)
+    file_path=parent_file_path+r'\Test-train-results_NN.csv'
     
     #Choose columns to average for the report
     ctavg=['precision','recall','f1-score'] 
@@ -115,11 +115,11 @@ def run_RF_traintest(shading=True,num_iterations=100):
                                                                      test_size=0.2,
                                                                      scaling=False)  #no z-transformation anymore  
             #Refit to new data
-            random_forest.fit(x_train,y_train)
+            neural_network.fit(x_train,y_train)
                 
             #Evaluation and Result manipulation    
             #Predict classes
-            y_pred=random_forest.predict(x_test)
+            y_pred=neural_network.predict(x_test)
             
             #Get f1,recall,precision etc.as DF
             report_tt=get_performance_metrics(y_test, y_pred)
@@ -156,22 +156,22 @@ def run_RF_traintest(shading=True,num_iterations=100):
     #%% Save aggregated Results to file / pdf
     
     #Write aggregated report, cm etc. to seperate csv_file
-    params=random_forest.get_params() #get params of model
-    write_output_to_csv(report_all.round(4),cm_all,params,file_name="Test-train-aggregated-results_RF",
-                        to_file="RF",shading=shading)
+    params=neural_network.get_params() #get params of model
+    write_output_to_csv(report_all.round(4),cm_all,params,file_name="Test-train-aggregated-results_NN",
+                        to_file="NN",shading=shading)
       
     #plot Confusion Matrix and save to pdf
-    plot_confusion_matrix(cm_all,to_file="RF",show_plot=False,normalize=True,
+    plot_confusion_matrix(cm_all,to_file="NN",show_plot=False,normalize=True,
                           shading=shading,
-                          title=f"TestTrain ConfusionMatrix RF shading {shading}")
+                          title=f"TestTrain ConfusionMatrix NN shading {shading}")
          
     #save (absolute) confusion matrix to file:
     save_object_to_file(cm_all,file_name="TestTrain_CM",
-                        to_file="RF",shading=shading)
+                        to_file="NN",shading=shading)
     
     #save (aggregated) report (f1_score etc.) to file:
     save_object_to_file(report_all,file_name="TestTrain_report",
-                        to_file="RF",shading=shading)
+                        to_file="NN",shading=shading)
     
     #Print result
     print(f'All data has been sucessfully written to files \nSee Filepath:\n {parent_file_path}')
