@@ -931,29 +931,37 @@ def get_GS_traintime (to_file,shading):
     #Append Name of Gridsearch.csv-file
     file_path=parent_file_path +r'\Grid-search-results_'+to_file+'.csv'
     
-    #define search value and column
+    #define value rank to search for
     search_value = 1 #we want to get rank = first (best model)
-    column_index= 14 #starting with 0, 15th column = rank_test_accuracy
     
-    #search for first rank in csv_file and give back mean fit time
-    #if multiple first ranks (same accuracy score) first row found is chosen (same as GSCV does it)
+    """
+    First get the column index, where the rank_test_accuracy is
+    afterwards search for the first rank (1) in that column and give 
+    back the mean training time (second colum)
+    """
+
     #Open Csv_file
     with open (file_path,newline="") as file:
         
         #read in csv-file
         reader=csv.reader(file,delimiter=";")
         
-        #Skip the first row (because those are the headings)
-        next(reader)
+        #Get column index where "rank_test_accuracy" is (depends on number of search-values)
+        first_row=next(reader)
         
-        #iterate over each row
+        #Search column index
+        for index, value in enumerate(first_row):
+            if value == "rank_test_accuracy":
+                column_index=index
+                        
+        #iterate over each row for rank search
         for row in reader:
-            print(f'row an dem column index: {row[column_index]}')
+            print(f'row : {row[0]}')
             #look for rank 1 in column 14
             if search_value == int(row[column_index]):                
                 #get mean fit time in secound column of matched row
                 mean_fit_time=row[1] #zweite spalte = mean_fit_time                
-                print(f'found {search_value} in row {row}, giving back mean fit time {mean_fit_time}')
+                print(f'found rank {search_value} in row {row[0]}, giving back mean fit time {mean_fit_time}')
                 
                 break #break loop and return value found
                 
