@@ -921,10 +921,15 @@ def get_GS_traintime (to_file,shading):
 
     """
     
+    
+    
+    
+    
+    
     #Get filepath
     parent_file_path=get_filepath(model_sd=to_file,shading=shading)
     #Append Name of Gridsearch.csv-file
-    file_path=parent_file_path +'Grid-search-results_'+to_file+'.csv'
+    file_path=parent_file_path +r'\Grid-search-results_'+to_file+'.csv'
     
     #define search value and column
     search_value = 1 #we want to get rank = first (best model)
@@ -936,16 +941,20 @@ def get_GS_traintime (to_file,shading):
     with open (file_path,newline="") as file:
         
         #read in csv-file
-        reader=csv.reader(file)
+        reader=csv.reader(file,delimiter=";")
+        
+        #Skip the first row (because those are the headings)
+        next(reader)
         
         #iterate over each row
         for row in reader:
+            print(f'row an dem column index: {row[column_index]}')
             #look for rank 1 in column 14
-            if search_value in row[column_index]:
-                print(f'found {search_value} in row {row}, giving back mean fit time')
-                
+            if search_value == int(row[column_index]):                
                 #get mean fit time in secound column of matched row
-                mean_fit_time=row[1] #zweite spalte = mean_fit_time
+                mean_fit_time=row[1] #zweite spalte = mean_fit_time                
+                print(f'found {search_value} in row {row}, giving back mean fit time {mean_fit_time}')
+                
                 break #break loop and return value found
                 
     return mean_fit_time

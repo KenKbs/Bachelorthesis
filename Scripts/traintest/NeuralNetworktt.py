@@ -11,6 +11,7 @@ from Scripts.util import (
     filter_data,
     generate_table,
     get_filepath,
+    get_GS_traintime,
     train_test_split_data,
     load_object_from_file,
     get_performance_metrics,
@@ -20,7 +21,8 @@ from Scripts.util import (
     save_object_to_file,
     convert_to_srow)
 
-
+import numpy as np
+import time
 
 #%% main function
 def run_NN_traintest(shading=True,num_iterations=100):
@@ -85,9 +87,18 @@ def run_NN_traintest(shading=True,num_iterations=100):
     #Convert report_all to single row
     single_row=convert_to_srow(report_all,run)
     
+    #Get train_time from Gridsearch
+    train_time_GS=get_GS_traintime(to_file="NN", shading=shading)
+    
+    # Add train-time of Gridsearch for best-model
+    single_row=np.append(single_row,train_time_GS)
+    
     #Create custom row labels based on index and column names first four = iterable index last two = index name of df
     row_labels=convert_to_srow(df=report_all,insert_value='run_counter',
                                extract_labels=True)
+    
+    #Add fit_time to row-labels
+    row_labels=np.append(row_labels,"train or test time in seconds")
     
     #Get file_path and attach filename
     parent_file_path=get_filepath(model_sd="NN",shading=shading)
@@ -113,10 +124,19 @@ def run_NN_traintest(shading=True,num_iterations=100):
             # Split data w. own fuinction, scaling = True
             x_train, x_test, y_train, y_test = train_test_split_data(data=data,
                                                                      test_size=0.2,
-                                                                     scaling=False)  #no z-transformation anymore  
+                                                                     scaling=False)  #no z-transformation anymore 
+            #Time-Tracking
+            start_time=time.time()
+            
             #Refit to new data
             neural_network.fit(x_train,y_train)
-                
+            
+            #End-Time
+            end_time=time.time()
+            
+            #Time Difference
+            train_time_sec=end_time-start_time
+            
             #Evaluation and Result manipulation    
             #Predict classes
             y_pred=neural_network.predict(x_test)
@@ -129,6 +149,9 @@ def run_NN_traintest(shading=True,num_iterations=100):
             
             #convert tt_Results to single row
             single_row=convert_to_srow(report_tt,run)
+            
+            #Append testing (refit) time
+            single_row=np.append(single_row,train_time_sec)
             
             #Write results of this run to csv
             file.write(';'.join(map(str,single_row))+'\n')

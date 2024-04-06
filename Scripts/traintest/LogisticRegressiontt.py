@@ -95,7 +95,7 @@ def run_LR_traintest(shading=True,num_iterations=100):
     row_labels=convert_to_srow(report_all,'run_counter',extract_labels=True)
     
     #Append fit-time to row_labels
-    row_labels=np.append(row_labels,"train-time in seconds")
+    row_labels=np.append(row_labels,"train or test time in seconds")
     
     #Get file_path
     parent_file_path=get_filepath(model_sd="LR",shading=shading)
