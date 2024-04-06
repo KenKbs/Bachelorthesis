@@ -11,6 +11,7 @@ IDE Spyder
 import os
 import sys #not needed yet?
 from scipy.io import loadmat #for loading mat-files
+import csv
 
 #Pandas, Numpy, itertools,pickle
 import pandas as pd
@@ -34,11 +35,10 @@ from sklearn.metrics import (
     classification_report
     )
 
-
 #SK-GridSearch
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 
-#Plots
+#Plots, graphviz
 import matplotlib.pyplot as plt
 
 try: 
@@ -899,6 +899,58 @@ def perform_grid_search(x_train,y_train,model,param_grid,k=5):
     
     #Return best model and search results
     return best_model,cv_results
+
+
+def get_GS_traintime (to_file,shading):
+    """
+    Requires get_filepath function imported
+    Go to gridsearch.csv file of the specific model, find the best rank (best model)
+    and give back mean fit time.
+
+    Parameters
+    ----------
+    to_file : String
+        specified model ("LR","NN" etc.)
+    shading : Bool
+        If True, include shading, else exclude.
+
+    Returns
+    -------
+    mean_fit_time : int,float
+        mean_time in seconds needed on average for all 5 Cross-validation folds.
+
+    """
+    
+    #Get filepath
+    parent_file_path=get_filepath(model_sd=to_file,shading=shading)
+    #Append Name of Gridsearch.csv-file
+    file_path=parent_file_path +'Grid-search-results_'+to_file+'.csv'
+    
+    #define search value and column
+    search_value = 1 #we want to get rank = first (best model)
+    column_index= 14 #starting with 0, 15th column = rank_test_accuracy
+    
+    #search for first rank in csv_file and give back mean fit time
+    #if multiple first ranks (same accuracy score) first row found is chosen (same as GSCV does it)
+    #Open Csv_file
+    with open (file_path,newline="") as file:
+        
+        #read in csv-file
+        reader=csv.reader(file)
+        
+        #iterate over each row
+        for row in reader:
+            #look for rank 1 in column 14
+            if search_value in row[column_index]:
+                print(f'found {search_value} in row {row}, giving back mean fit time')
+                
+                #get mean fit time in secound column of matched row
+                mean_fit_time=row[1] #zweite spalte = mean_fit_time
+                break #break loop and return value found
+                
+    return mean_fit_time
+
+
 
 #%% Test Train functions
 
