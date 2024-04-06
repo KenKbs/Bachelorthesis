@@ -132,8 +132,8 @@ My Thinking:
 # TESTING
 # REMOVE LATER AND CHANGE FUNCTION CALL!
 param_grid_t = {'hidden_layer_sizes': [(100,),(100,50),(1000,750,500,250,100,50),
-                                       (10000,7500,5000,2500),
-                                       (10000,7500,5000,2500,1000,500,250,100)]}
+                                       (10000,7500,5000,2500)]
+                                       }
 
 # %%Perform Grid_search
 #with parallel_config(temp_folder='/temp',max_nbytes='4M'): #Change temporary folder to where space is (C:/temp) and maxbytes to 4 to avoid memory explosion
