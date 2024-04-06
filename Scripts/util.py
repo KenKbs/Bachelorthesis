@@ -905,7 +905,7 @@ def get_GS_traintime (to_file,shading):
     """
     Requires get_filepath function imported
     Go to gridsearch.csv file of the specific model, find the best rank (best model)
-    and give back mean fit time.
+    and give back mean fit training time.
 
     Parameters
     ----------
@@ -920,10 +920,6 @@ def get_GS_traintime (to_file,shading):
         mean_time in seconds needed on average for all 5 Cross-validation folds.
 
     """
-    
-    
-    
-    
     
     
     #Get filepath
