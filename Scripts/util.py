@@ -921,7 +921,7 @@ def get_GS_traintime (to_file,shading):
 
     """
     
-    
+    print('Searching for mean_fit_time of best_model in Gridsearch.csv ')
     #Get filepath
     parent_file_path=get_filepath(model_sd=to_file,shading=shading)
     #Append Name of Gridsearch.csv-file

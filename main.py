@@ -12,17 +12,14 @@ if __name__ == "__main__":
     import Scripts.gridsearch.LogisticRegression as GLR
     import Scripts.gridsearch.DecisionTree as DT
     import Scripts.gridsearch.RandomForest as RF
+    import Scripts.gridsearch.NeuralNetwork as NN
     
     #Traintest Imports
     import Scripts.traintest.LogisticRegressiontt as TTLR
     import Scripts.traintest.DecisionTreett as TTDT
     import Scripts.traintest.RandomForestt as TTRF
+    import Scripts.traintest.NeuralNetworktt as TTNN
     
-
-    
-    #%%Testing
-       
-    # print(UT.get_filepath(model_sd="LR",shading=True))
         
     #%%Run Gridsearch
     
@@ -32,21 +29,24 @@ if __name__ == "__main__":
     
     
     #Decision Tree
-    #DT.overfit_DT(shading=True,runs=100)
-    #DT.overfit_DT(shading=False,runs=100)
+    # DT.overfit_DT(shading=True,runs=100)
+    # DT.overfit_DT(shading=False,runs=100)
     # DT.run_DT_gridsearch(shading=True)
     # DT.run_DT_gridsearch(shading=False)
     
-    #DT.overfit_DT(shading=False,runs=100)
-    #DT.run_DT_gridsearch(shading=False)
+    # DT.overfit_DT(shading=False,runs=100)
+    # DT.run_DT_gridsearch(shading=False)
 
     #Random Forest    
-    RF.run_RF_gridsearch(shading=True)
-    RF.run_RF_gridsearch(shading=False)
+    # RF.run_RF_gridsearch(shading=True)
+    # RF.run_RF_gridsearch(shading=False)
     
-    #SVM
+    #Support Vector Machine
     
     #Neural Network
+    NN.run_NN_gridsearch(shading=True)
+    # NN.run_NN_gridsearch(shading=False)
+
 
     #%%Run Test-split repeaditly
     
@@ -59,11 +59,19 @@ if __name__ == "__main__":
     # TTDT.run_DT_traintest(shading=False,num_iterations=100)
     
     #Random Forest
-    TTRF.run_RF_traintest(shading=True,num_iterations=100)
-    TTRF.run_RF_traintest(shading=False,num_iterations=100)
+    # TTRF.run_RF_traintest(shading=True,num_iterations=100)
+    # TTRF.run_RF_traintest(shading=False,num_iterations=100)
     
+    #Support Vector Machine
     
-    #Testing for DOT export if render with graphviz failed!
-    # UT.plot_from_dot_file("Overfitted_tree", shading=True, to_file="DT",#file_path=r'C:\Users\Kenny\Dropbox\Education\Uni\FU-Berlin\Inhalte\9. Semester\Bachelorarbeit\Programmierung\GitHub-Repo\Bachelorthesis\Results\DT\Shading',
-    #                       output_filename="Test123")
+    #Neural Network
+    TTNN.run_NN_traintest(shading=True,num_iterations=3)
+    # TTNN.run_NN_traintest(shading=False,num_iterations=3)
+    
+        
+    #%%DOT export 
+    #if render with graphviz failed (for DT and RF)
+    # UT.plot_from_dot_file("Overfitted_tree", shading=True, to_file="DT",
+    #                       output_filename="Decision_tree",vector_export=True
+    #                       ,png_export=False)
     

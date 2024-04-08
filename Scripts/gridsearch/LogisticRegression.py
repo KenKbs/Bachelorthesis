@@ -28,6 +28,8 @@ from sklearn.linear_model import LogisticRegression
 
 def run_LR_gridsearch(shading=True):    
     #%% Read in and filter data
+    #Print Status
+    print(f'Running Gridsearch for Logistic Regression. Shading = {str(shading)}.')
     
     #Read-in Data
     raw_data=get_data()

@@ -71,6 +71,9 @@ def run_DT_gridsearch(shading=True):
 
     """
     #Read-in Data
+    #Print Status
+    print(f'Running Gridsearch for Decision Tree. Shading = {str(shading)}.')
+    
     raw_data=get_data()
     
     #filter data

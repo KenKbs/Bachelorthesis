@@ -66,6 +66,8 @@ def run_SVM_gridsearch(shading=True):
 #put later into function
 shading=True
 
+#Print Status
+print(f'Running Gridsearch for Support Vector Machine. Shading = {str(shading)}.')
     
 # Read-in Data
 raw_data = get_data()

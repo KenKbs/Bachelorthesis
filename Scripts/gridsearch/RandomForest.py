@@ -66,6 +66,10 @@ def run_RF_gridsearch(shading=True):
 
     
     # Read-in Data
+    #Print Status
+    print(f'Running Gridsearch for Random Forest. Shading = {str(shading)}.')
+    
+    #Read in Data
     raw_data = get_data()
     
     # filter data
