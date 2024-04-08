@@ -20,11 +20,6 @@ if __name__ == "__main__":
     import Scripts.traintest.RandomForestt as TTRF
     import Scripts.traintest.NeuralNetworktt as TTNN
     
-
-    
-    #%%Testing
-       
-    # print(UT.get_filepath(model_sd="LR",shading=True))
         
     #%%Run Gridsearch
     
@@ -49,8 +44,9 @@ if __name__ == "__main__":
     #Support Vector Machine
     
     #Neural Network
-    # NN.run_NN_gridsearch(shading=True)
-    NN.run_NN_gridsearch(shading=False)
+    NN.run_NN_gridsearch(shading=True)
+    # NN.run_NN_gridsearch(shading=False)
+
 
     #%%Run Test-split repeaditly
     
@@ -70,10 +66,11 @@ if __name__ == "__main__":
     
     #Neural Network
     TTNN.run_NN_traintest(shading=True,num_iterations=3)
-    TTNN.run_NN_traintest(shading=False,num_iterations=3)
+    # TTNN.run_NN_traintest(shading=False,num_iterations=3)
     
-    
-    #DOT export if render with graphviz failed (for DT and RF)
+        
+    #%%DOT export 
+    #if render with graphviz failed (for DT and RF)
     # UT.plot_from_dot_file("Overfitted_tree", shading=True, to_file="DT",
     #                       output_filename="Decision_tree",vector_export=True
     #                       ,png_export=False)

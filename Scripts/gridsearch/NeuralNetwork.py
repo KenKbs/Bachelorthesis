@@ -138,7 +138,7 @@ def run_NN_gridsearch(shading=True):
     
     # TESTING
     # REMOVE LATER AND CHANGE FUNCTION CALL!
-    param_grid_t = {'hidden_layer_sizes': [(2),(15),(35),(4,35),(35,35)]}
+    # param_grid_t = {'hidden_layer_sizes': [(2),(15),(35),(4,35),(35,35)]}
     
     #Define parameter grid
     param_grid={'hidden_layer_sizes':hidden_layer_sizes,
@@ -148,7 +148,7 @@ def run_NN_gridsearch(shading=True):
     # %%Perform Grid_search
     with parallel_config(temp_folder='/temp',max_nbytes='4M'): #Change temporary folder to where space is (C:/temp) and maxbytes to 4 to avoid memory explosion
         best_model, cv_results = perform_grid_search(
-                                 x_train, y_train, neural_network, param_grid_t)
+                                 x_train, y_train, neural_network, param_grid)
     
     # Get best_model parameters
     best_model_params = best_model.get_params()
