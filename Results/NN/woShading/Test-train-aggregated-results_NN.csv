@@ -1,0 +1,18 @@
+index;precision;recall;f1-score;support
+0.0;0.9997;0.9998;0.9997;6185100.0
+1.0;0.9986;0.9952;0.9969;120000.0
+2.0;0.9913;0.987;0.989;207400.0
+3.0;0.9959;1.0;0.9979;120500.0
+macro avg;0.9964;0.9955;0.9959;6633000.0
+weighted avg;0.9993;0.9993;0.9993;6633000.0
+
+ 
+;0;1;2;3
+0;6183801;0;1292;7
+1;53;119430;516;1
+2;2029;172;204711;488
+3;0;0;0;120500
+
+ 
+activation;alpha;batch_size;beta_1;beta_2;early_stopping;epsilon;hidden_layer_sizes;learning_rate;learning_rate_init;max_fun;max_iter;momentum;n_iter_no_change;nesterovs_momentum;power_t;random_state;shuffle;solver;tol;validation_fraction;verbose;warm_start
+relu;0.001;auto;0.9;0.999;False;1e-08;(8, 20);constant;0.001;15000;500;0.9;10;True;0.5;;True;adam;0.0001;0.1;False;False
