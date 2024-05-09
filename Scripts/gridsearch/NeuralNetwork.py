@@ -134,7 +134,7 @@ def run_NN_gridsearch(shading=True):
     activation=['relu','tanh','logistic'] #relu from Utama, tanh logistic from li
         
     #Both (Utama and default SKlearn)
-    alpha=[0.001,0.0001]
+    alpha=[0.0001,0.01,1,100] #4 Repräsentanten, Standard, Medium, Strong regularizaiton
     
     # TESTING
     # REMOVE LATER AND CHANGE FUNCTION CALL!
