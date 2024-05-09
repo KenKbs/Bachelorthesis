@@ -93,11 +93,11 @@ else:
 # Split data w. own fuinction, scaling = False
 x_train, x_test, y_train, y_test = train_test_split_data(data=data,
                                                          test_size=0.2,
-                                                         scaling=False)#???
+                                                         scaling=True)#???
 
 # %% Define Model to tune (SVM)
 support_vm=SVC(cache_size=500, 
-              shrinking=False,
+              shrinking=True,
               decision_function_shape="ovr",
               break_ties=False)#?
 
@@ -145,15 +145,14 @@ penalization_parameter=[0.000001,0.00001,0.0001,0.001,0.01,0.02,0.03,0.04,0.05,0
                     40000,50000,60000,70000,80000,90000,100000,
                     200000,300000,400000,500000,600000,700000,800000,900000,
                     1000000] #Probably need a smaller grid for c...
+
+penalization_parameter=[0.0001,0.01,1,2,5,10,
+                        25,50,75,100,
+                        250,500,1000]
 #Gamma
-gamma=['scale','auto']
+gamma=['scale','auto',
+       0.01,0.1,0.5,1,2,5,10,15,20,25]
 
-#coef0
-coef0=[0.0] #default should be flaot, independent term
-
-#degree of polynomial
-degree=[2]
-degree.extend(pol for pol in range (3,101)) #polynomials bis zum einhunderten Grad mit einbeziehen
 
 
 #Radial Basis Function (infinte dimensions)
@@ -161,6 +160,14 @@ rbf_kernel={'C':penalization_parameter,
             'kernel':['rbf'],
             'gamma':gamma
             }
+"""
+#coef0 not relevant for rbf
+coef0=[0.0] #default should be flaot, independent term
+
+#degree of polynomial - not relevant for rbf
+degree=[2]
+degree.extend(pol for pol in range (3,101)) #polynomials bis zum einhunderten Grad mit einbeziehen
+
 
 #polynomial function
 poly_kernel={'C':penalization_parameter,
@@ -174,14 +181,14 @@ poly_kernel={'C':penalization_parameter,
 linear_kernel={'C':penalization_parameter,
                'kernel':['linear'],
                }
+"""
 
-
-# Define whole grid (list of 4 dictonaries)
-param_grid = [rbf_kernel, poly_kernel,linear_kernel]
+# Define whole grid (list of 3 dictonaries)
+param_grid = rbf_kernel
 
 # TESTING
 # REMOVE LATER AND CHANGE FUNCTION CALL!
-param_grid_t = {'C': [1, 0.01,2]}
+param_grid_t = {'C': [1]}
 
 # %%Perform Grid_search
 with parallel_config(temp_folder='/temp',max_nbytes='4M'): #Change temporary folder to where space is (C:/temp) and maxbytes to 4 to avoid memory explosion
@@ -190,7 +197,6 @@ with parallel_config(temp_folder='/temp',max_nbytes='4M'): #Change temporary fol
 
 # Get best_model parameters
 best_model_params = best_model.get_params()
-
 
 # %%Performance evaluation
 
