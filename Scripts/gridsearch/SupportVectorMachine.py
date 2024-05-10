@@ -25,7 +25,9 @@ from Scripts.util import (
 
 # SK-learn model imports
 from sklearn.svm import SVC
-                              
+     
+# SK-learn Preprocessing
+from sklearn.model_selection import train_test_split                         
 
 # #Other Imports
 # import pandas as pd
@@ -93,7 +95,14 @@ else:
 # Split data w. own fuinction, scaling = False
 x_train, x_test, y_train, y_test = train_test_split_data(data=data,
                                                          test_size=0.2,
-                                                         scaling=True)#???
+                                                         scaling=False)
+
+#reduce train size, of x_train and y_train by applying train/test again! 
+x_train,_,y_train,_= train_test_split(x_train, y_train, test_size = 0.9,stratify=y_train)
+#Only keep 10% of the 80% training data, so in total 8% Do with this 8% the gridsearch. Still use the 
+# 20% of whole data in the end for testing / verifying 
+# That way, "test leackage" gets avoided, 90% of original train set get discarded (test_size = 90)
+
 
 # %% Define Model to tune (SVM)
 support_vm=SVC(cache_size=500, 
@@ -210,8 +219,7 @@ accuracy = get_performance_metrics(y_test, y_pred_best, only_accuracy=True)
 report = get_performance_metrics(y_test, y_pred_best)  # report=df
 
 # Get confusion Matrix
-cm = get_confusion_matrix(y_test, y_pred_best, normalize=False)
-
+cm = get_confusion_matrix(y_test, y_pred_best, normalize=False) 
 
 # %% Save Results to file / csv
 
