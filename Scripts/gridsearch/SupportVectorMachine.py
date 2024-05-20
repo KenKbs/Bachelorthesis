@@ -95,10 +95,10 @@ else:
 # Split data w. own fuinction, scaling = False
 x_train, x_test, y_train, y_test = train_test_split_data(data=data,
                                                          test_size=0.2,
-                                                         scaling=False)
+                                                         scaling=True)
 
 #reduce train size, of x_train and y_train by applying train/test again! 
-x_train,_,y_train,_= train_test_split(x_train, y_train, test_size = 0.9,stratify=y_train)
+x_train,_,y_train,_= train_test_split(x_train, y_train, test_size = 0.75,stratify=y_train)
 #Only keep 10% of the 80% training data, so in total 8% Do with this 8% the gridsearch. Still use the 
 # 20% of whole data in the end for testing / verifying 
 # That way, "test leackage" gets avoided, 90% of original train set get discarded (test_size = 90)
@@ -107,7 +107,7 @@ x_train,_,y_train,_= train_test_split(x_train, y_train, test_size = 0.9,stratify
 # %% Define Model to tune (SVM)
 support_vm=SVC(cache_size=500, 
               shrinking=True,
-              decision_function_shape="ovr",
+              decision_function_shape="ovo",
               break_ties=False)#?
 
 
@@ -155,12 +155,13 @@ penalization_parameter=[0.000001,0.00001,0.0001,0.001,0.01,0.02,0.03,0.04,0.05,0
                     200000,300000,400000,500000,600000,700000,800000,900000,
                     1000000] #Probably need a smaller grid for c...
 
-penalization_parameter=[0.0001,0.01,1,2,5,10,
+penalization_parameter=[0.0001,0.001,0.01,0.1,1,2,5,10,15,
                         25,50,75,100,
-                        250,500,1000]
+                        250,500,750,1000,2000,5000]
 #Gamma
 gamma=['scale','auto',
-       0.01,0.1,0.5,1,2,5,10,15,20,25]
+       0.0001,0.001,0.01,0.1,0.5,
+       1,2,5,10,15,20,25,30,40,50,75,100,250,500,1000] 
 
 
 
