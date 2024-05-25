@@ -124,7 +124,7 @@ def run_SVM_traintest(shading=True,num_iterations=100):
             # Split data w. own fuinction, scaling = True
             x_train, x_test, y_train, y_test = train_test_split_data(data=data,
                                                                      test_size=0.2,
-                                                                     scaling=False)  #no z-transformation anymore  
+                                                                     scaling=True)  #perform z-transformation 
             #Time-tracking
             start_time=time.time()
             
@@ -143,9 +143,7 @@ def run_SVM_traintest(shading=True,num_iterations=100):
             
             #Get f1,recall,precision etc.as DF
             report_tt=get_performance_metrics(y_test, y_pred)
-            
-            
-            
+                                   
             #Get confusion Matrix as DF
             cm_tt=get_confusion_matrix(y_test, y_pred,normalize=False)
             
@@ -167,7 +165,6 @@ def run_SVM_traintest(shading=True,num_iterations=100):
             
             #report - add up support column (number of cases)
             report_all['support']=report_all['support']+report_tt['support']
-
             
             #Add up Confusion Matrix
             cm_all=cm_all+cm_tt
