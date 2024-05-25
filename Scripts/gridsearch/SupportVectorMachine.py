@@ -70,11 +70,7 @@ def run_SVM_gridsearch(shading=True):
         generate_table(raw_data, data, "Raw", "Shad. excl")
     
     
-    # Grid search preparations
-    
-    
-    
-    # Split data w. own fuinction, scaling = False
+    # Split data w. own fuinction, scaling = True
     x_train, x_test, y_train, y_test = train_test_split_data(data=data,
                                                              test_size=0.2,
                                                              scaling=True)
@@ -92,7 +88,7 @@ def run_SVM_gridsearch(shading=True):
     support_vm=SVC(cache_size=500, 
                   shrinking=True,
                   decision_function_shape="ovo",
-                  break_ties=False)#?
+                  break_ties=False)
     
     
     # %% Set Parameter to tune
