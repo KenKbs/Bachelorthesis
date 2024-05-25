@@ -12,12 +12,14 @@ if __name__ == "__main__":
     import Scripts.gridsearch.LogisticRegression as GLR
     import Scripts.gridsearch.DecisionTree as DT
     import Scripts.gridsearch.RandomForest as RF
+    import Scripts.gridsearch.SupportVectorMachine as SVM
     import Scripts.gridsearch.NeuralNetwork as NN
     
     #Traintest Imports
     import Scripts.traintest.LogisticRegressiontt as TTLR
     import Scripts.traintest.DecisionTreett as TTDT
     import Scripts.traintest.RandomForestt as TTRF
+    import Scripts.traintest.SupportVectorMachinett as TTSVM
     import Scripts.traintest.NeuralNetworktt as TTNN
     
         
@@ -26,25 +28,23 @@ if __name__ == "__main__":
     #Logistic Regression
     # GLR.run_LR_gridsearch(shading=True)
     # GLR.run_LR_gridsearch(shading=False)
-    
-    
+        
     #Decision Tree
     # DT.overfit_DT(shading=True,runs=100)
     # DT.overfit_DT(shading=False,runs=100)
     # DT.run_DT_gridsearch(shading=True)
     # DT.run_DT_gridsearch(shading=False)
     
-    # DT.overfit_DT(shading=False,runs=100)
-    # DT.run_DT_gridsearch(shading=False)
-
     #Random Forest    
     # RF.run_RF_gridsearch(shading=True)
     # RF.run_RF_gridsearch(shading=False)
     
     #Support Vector Machine
+    SVM.run_SVM_gridsearch(shading=True)
+    SVM.run_SVM_gridsearch(shading=False)
     
     #Neural Network
-    NN.run_NN_gridsearch(shading=True)
+    # NN.run_NN_gridsearch(shading=True)
     # NN.run_NN_gridsearch(shading=False)
 
 
@@ -63,10 +63,12 @@ if __name__ == "__main__":
     # TTRF.run_RF_traintest(shading=False,num_iterations=100)
     
     #Support Vector Machine
+    TTSVM.run_SVM_traintest(shading=True,num_iterations=100)
+    TTSVM.run_SVM_traintest(shading=False,num_iterations=100)
     
     #Neural Network
-    TTNN.run_NN_traintest(shading=True,num_iterations=3)
-    # TTNN.run_NN_traintest(shading=False,num_iterations=3)
+    # TTNN.run_NN_traintest(shading=True,num_iterations=100)
+    # TTNN.run_NN_traintest(shading=False,num_iterations=100)
     
         
     #%%DOT export 
