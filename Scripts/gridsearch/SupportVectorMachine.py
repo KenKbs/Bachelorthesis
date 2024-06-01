@@ -76,10 +76,9 @@ def run_SVM_gridsearch(shading=True):
                                                              scaling=True)
     
     #reduce train size, of x_train and y_train by applying train/test again! 
-    if shading:
-        x_train,_,y_train,_= train_test_split(x_train, y_train, test_size = 0.75,stratify=y_train)
+    x_train,_,y_train,_= train_test_split(x_train, y_train, test_size = 0.75,stratify=y_train)
     """
-    For dataset A, Only keep 20% of the 80% training data, so in total 20% Do with this 20% the gridsearch. Still use the 
+    Only keep 20% of the 80% training data, so in total 20% Do with this 20% the gridsearch. Still use the 
     20% of whole data in the end for testing / verifying 
     That way, "test leackage" gets avoided, 75% of original train set get discarded (test_size = 75%)
     """
