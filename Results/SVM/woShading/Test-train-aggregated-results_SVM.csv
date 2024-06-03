@@ -1,0 +1,18 @@
+index;precision;recall;f1-score;support
+0.0;1.0;1.0;1.0;6185100.0
+1.0;0.9987;0.9966;0.9976;120000.0
+2.0;0.9984;0.9972;0.9978;207400.0
+3.0;0.9967;1.0;0.9984;120500.0
+macro avg;0.9984;0.9985;0.9984;6633000.0
+weighted avg;0.9999;0.9999;0.9999;6633000.0
+
+ 
+;0;1;2;3
+0;6185100;0;0;0
+1;71;119591;338;0
+2;16;160;206826;398
+3;0;0;0;120500
+
+ 
+C;break_ties;cache_size;class_weight;coef0;decision_function_shape;degree;gamma;kernel;max_iter;probability;random_state;shrinking;tol;verbose
+100;False;500;;0.0;ovo;3;scale;rbf;-1;False;;True;0.001;False

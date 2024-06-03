@@ -70,20 +70,15 @@ def run_SVM_gridsearch(shading=True):
         generate_table(raw_data, data, "Raw", "Shad. excl")
     
     
-    # Grid search preparations
-    
-    
-    
-    # Split data w. own fuinction, scaling = False
+    # Split data w. own fuinction, scaling = True
     x_train, x_test, y_train, y_test = train_test_split_data(data=data,
                                                              test_size=0.2,
                                                              scaling=True)
     
     #reduce train size, of x_train and y_train by applying train/test again! 
-    if shading:
-        x_train,_,y_train,_= train_test_split(x_train, y_train, test_size = 0.75,stratify=y_train)
+    x_train,_,y_train,_= train_test_split(x_train, y_train, test_size = 0.75,stratify=y_train)
     """
-    For dataset A, Only keep 20% of the 80% training data, so in total 20% Do with this 20% the gridsearch. Still use the 
+    Only keep 20% of the 80% training data, so in total 20% Do with this 20% the gridsearch. Still use the 
     20% of whole data in the end for testing / verifying 
     That way, "test leackage" gets avoided, 75% of original train set get discarded (test_size = 75%)
     """
@@ -92,7 +87,7 @@ def run_SVM_gridsearch(shading=True):
     support_vm=SVC(cache_size=500, 
                   shrinking=True,
                   decision_function_shape="ovo",
-                  break_ties=False)#?
+                  break_ties=False)
     
     
     # %% Set Parameter to tune
