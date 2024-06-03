@@ -220,22 +220,41 @@ def plot_confusion_matrix(cm_LR,cm_DT,cm_RF,cm_SVM,cm_NN,
         cm_NN = cm_NN.astype('float') / cm_NN.sum(axis=1)[:, np.newaxis]
 
     #plot values into Matrix
-    thresh = cm_LR.max() / 1.00 if normalize else cm_LR.max() / 2 #thres first = 1.5 orginally, disable white drawing for normalized, because high class imbalance!
+    # REMOVE AS COLORS AR DIFFERENT!thresh = cm_LR.max() / 1.00 if normalize else cm_LR.max() / 2 #thres first = 1.5 orginally, disable white drawing for normalized, because high class imbalance!
     for i, j in itertools.product(range(cm_LR.shape[0]), range(cm_LR.shape[1])):
         if normalize:
-            plt.text(j, i, "{:0.2f}%".format(cm_LR[i, j]*100),
+            plt.text(j, i-0.2, "{:0.2f}%".format(cm_LR[i, j]*100),
                      horizontalalignment="center",
-                     color="white" if cm_LR[i, j] > thresh else "black")
+                     color="blue")            
             plt.text(j, i-0.1, "{:0.2f}%".format(cm_DT[i, j]*100),
                      horizontalalignment="center",
-                     color="white" if cm_DT[i, j] > thresh else "black")
+                     color="purple")            
+            plt.text(j, i, "{:0.2f}%".format(cm_RF[i, j]*100),
+                     horizontalalignment="center",
+                     color="green")            
+            plt.text(j, i+0.1, "{:0.2f}%".format(cm_SVM[i, j]*100),
+                     horizontalalignment="center",
+                     color="red")            
+            plt.text(j, i+0.2, "{:0.2f}%".format(cm_NN[i, j]*100),
+                     horizontalalignment="center",
+                     color="black")
+
         else:
-            plt.text(j, i, "{:0.2f}%".format(cm_LR[i, j]*100),
+            plt.text(j, i-0.2, "{:,}".format(cm_LR[i, j]),
                      horizontalalignment="center",
-                     color="white" if cm_LR[i, j] > thresh else "black")
-            plt.text(j, i-0.1, "{:0.2f}%".format(cm_DT[i, j]*100),
+                     color="blue" )
+            plt.text(j, i-0.1, "{:,}".format(cm_DT[i, j]),
                      horizontalalignment="center",
-                     color="white" if cm_DT[i, j] > thresh else "black")
+                     color="purple")
+            plt.text(j, i, "{:,}".format(cm_RF[i, j]),
+                     horizontalalignment="center",
+                     color="green")
+            plt.text(j, i+0.1, "{:,}".format(cm_SVM[i, j]),
+                     horizontalalignment="center",
+                     color="red")
+            plt.text(j, i+0.2, "{:,}".format(cm_NN[i, j]),
+                     horizontalalignment="center",
+                     color="black")
 
     #Adjust axis
     plt.tight_layout()
@@ -243,8 +262,8 @@ def plot_confusion_matrix(cm_LR,cm_DT,cm_RF,cm_SVM,cm_NN,
     plt.xlabel('Predicted label\naccuracy={:0.4f}; misclass={:0.4f}'.format(accuracy, misclass))
     
     # Adding a legend
-    colors = ['blue', 'red', 'green', 'purple', 'orange']
-    legend_labels = ['Model 1', 'Model 2', 'Model 3', 'Model 4', 'Model 5']
+    colors = ['blue', 'purple', 'green', 'red', 'black']
+    legend_labels = ['LR', 'DT', 'RF', 'SVM', 'NN']
     legend_handles = [
     plt.Line2D([0], [0], marker='o', color='w', label=legend_labels[i], markerfacecolor=colors[i], markersize=10)
     for i in range(5)
