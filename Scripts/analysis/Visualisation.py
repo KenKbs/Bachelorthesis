@@ -6,7 +6,7 @@ Created on Sat May 25 23:48:26 2024
 """
 
 
-#%% iteration 3
+#%% SKIP THIS; DOES NOT WORK!!!!
 import matplotlib.pyplot as plt
 import numpy as np
 import itertools
@@ -87,26 +87,37 @@ PROBLEMS:
 """
 
 
-#%% "OLD" CODE:
+#%% Use THIS!!! "Old Code":
+
+#Imports
 from Scripts.util import load_object_from_file
-import pandas as pd
 import os
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import itertools
 
 neutral_df= pd.DataFrame(np.full((4, 4), 100))    
 neutral_df=neutral_df.values
 
-
 shading=True
-#load confusion matrix (from gridserach)
 
+#load confusion matrix (from gridserach)
 cm_LR=load_object_from_file("Grid-search_CM_LR.pk1",
                                      to_file="LR",shading=shading)
 
 cm_DT=load_object_from_file("Grid-search_CM_DT.pk1",
                                      to_file="DT",shading=shading)
 
-cm_RF=load_object_from_file("Grid-search_CM_RF.pk1",
+cm_RF=load_object_from_file("TestTrain_CM_RF.pk1",
                                      to_file="RF",shading=shading)
+
+cm_SVM=load_object_from_file("Grid-search_CM_SVM.pk1",
+                                     to_file="SVM",shading=shading)
+
+cm_NN=load_object_from_file("Grid-search_CM_NN.pk1",
+                                     to_file="NN",shading=shading)
+
     
 def plot_confusion_matrix(cm_LR,cm_DT,cm_RF,cm_SVM,cm_NN,
                           target_names=None,
@@ -166,33 +177,47 @@ def plot_confusion_matrix(cm_LR,cm_DT,cm_RF,cm_SVM,cm_NN,
     http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
 
     """
-    #Convert to ndarray, if df is given
-    if isinstance(cm_LR, pd.DataFrame):
-        cm_LR=cm_LR.values
+    #As DF's are given, convert to ndarray:
+    cm_LR=cm_LR.values
+    cm_DT=cm_DT.values
+    cm_RF=cm_RF.values
+    cm_SVM=cm_SVM.values
+    cm_NN=cm_NN.values
     
-    if isinstance(cm_DT,pd.DataFrame):
-        cm_DT=cm_DT.values
-    accuracy = np.trace(cm_LR) / np.sum(cm_LR).astype('float')
+    #calculate each single accuracy
+    accuracy_LR = np.trace(cm_LR) / np.sum(cm_LR).astype('float')
+    accuracy_DT = np.trace(cm_DT) / np.sum(cm_DT).astype('float')
+    accuracy_RF = np.trace(cm_RF) / np.sum(cm_RF).astype('float')
+    accuracy_SVM = np.trace(cm_SVM) / np.sum(cm_SVM).astype('float')
+    accuracy_NN = np.trace(cm_NN) / np.sum(cm_NN).astype('float')
+    
+    #calculate average accuracy
+    accuracy=(accuracy_LR+accuracy_DT+accuracy_RF+accuracy_SVM+accuracy_NN)/5
     misclass = 1 - accuracy
-
+    
+    #custom cmap
     if cmap is None:
         cmap = plt.get_cmap('Blues')
         
-
+    #plot basis
     plt.figure(figsize=(10, 8))
     plt.imshow(cm_LR, interpolation='nearest',cmap=cmap,alpha=1,vmax=0.9999999999,vmin=0.9999999998)
     plt.title(title)
     # plt.colorbar()
 
+    #custom target names
     if target_names is not None:
         tick_marks = np.arange(len(target_names))
         plt.xticks(tick_marks, target_names, rotation=45)
         plt.yticks(tick_marks, target_names)
-
+    
+    #normalize to percentage values
     if normalize:
         cm_LR = cm_LR.astype('float') / cm_LR.sum(axis=1)[:, np.newaxis]
         cm_DT = cm_DT.astype('float') / cm_DT.sum(axis=1)[:, np.newaxis]
-
+        cm_RF = cm_RF.astype('float') / cm_RF.sum(axis=1)[:, np.newaxis]
+        cm_SVM = cm_SVM.astype('float') / cm_SVM.sum(axis=1)[:, np.newaxis]
+        cm_NN = cm_NN.astype('float') / cm_NN.sum(axis=1)[:, np.newaxis]
 
     #plot values into Matrix
     thresh = cm_LR.max() / 1.00 if normalize else cm_LR.max() / 2 #thres first = 1.5 orginally, disable white drawing for normalized, because high class imbalance!
@@ -242,7 +267,7 @@ def plot_confusion_matrix(cm_LR,cm_DT,cm_RF,cm_SVM,cm_NN,
         fig.savefig(file_path,format="pdf",bbox_inches='tight',pad_inches=0.1) #bbox_inches for not cutting off labels!
 
 
-plot_confusion_matrix(cm_LR,cm_DT,cm_RF,None,None)
+plot_confusion_matrix(cm_LR,cm_DT,cm_RF,cm_SVM,cm_NN)
 
 """
 make a heatmap, which is all the same color (or grey)
