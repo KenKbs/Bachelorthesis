@@ -218,11 +218,20 @@ def plot_confusion_matrix(cm_LR,cm_DT,cm_RF,cm_SVM,cm_NN,
         cm_RF = cm_RF.astype('float') / cm_RF.sum(axis=1)[:, np.newaxis]
         cm_SVM = cm_SVM.astype('float') / cm_SVM.sum(axis=1)[:, np.newaxis]
         cm_NN = cm_NN.astype('float') / cm_NN.sum(axis=1)[:, np.newaxis]
-
+    
+    #Compute std. deviation
+    std_dev = np.std([cm_LR, cm_DT, cm_RF, cm_SVM, cm_NN], axis=0)
+    
+    #normalize std. deviation for heat mapping
+    norm_std_dev = (std_dev - np.min(std_dev)) / (np.max(std_dev) - np.min(std_dev))
+    
+    
     #plot values into Matrix
     # REMOVE AS COLORS AR DIFFERENT!thresh = cm_LR.max() / 1.00 if normalize else cm_LR.max() / 2 #thres first = 1.5 orginally, disable white drawing for normalized, because high class imbalance!
     for i, j in itertools.product(range(cm_LR.shape[0]), range(cm_LR.shape[1])):
         if normalize:
+            color_intensity = cmap(norm_std_dev[i,j])
+            plt.fill_between([j, j+1], [i, i], [i+1, i+1], color=color_intensity)
             plt.text(j, i-0.2, "{:0.2f}%".format(cm_LR[i, j]*100),
                      horizontalalignment="center",
                      color="blue")            
