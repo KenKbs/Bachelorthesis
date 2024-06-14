@@ -182,11 +182,11 @@ def run_LR_traintest(shading=True,num_iterations=100):
                           title=f"TestTrain ConfusionMatrix LR shading {shading}")
          
     #save (absolute) confusion matrix to file:
-    save_object_to_file(cm_all,file_name="TestTrain_CM_LR",
+    save_object_to_file(cm_all,file_name="TestTrain_CM",
                         to_file="LR",shading=shading)
     
     #save (aggregated) report (f1_score etc.) to file:
-    save_object_to_file(report_all,file_name="TestTrain_report_LR",
+    save_object_to_file(report_all,file_name="TestTrain_report",
                         to_file="LR",shading=shading)
     
     #Print result

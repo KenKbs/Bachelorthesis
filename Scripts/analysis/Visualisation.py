@@ -16,7 +16,9 @@ import pandas as pd
 import numpy as np
 import itertools
 
+#%%Plot Confusion Matrix
 
+# Shading True (Dataset A)
 shading = True
 
 # Load confusion matrix (from gridsearch)
@@ -35,14 +37,11 @@ cm_SVM = load_object_from_file("Grid-search_CM_SVM.pk1",
 cm_NN = load_object_from_file("Grid-search_CM_NN.pk1",
                               to_file="NN", shading=shading)
 
-
-
-
 plot_aggregated_confusion_matrix(cm_LR, cm_DT, cm_RF, cm_SVM, cm_NN,
                                  title="Confusion Matrix Dataset A",to_file="FINAL",
                                  show_plot=True)
 
-
+# Shading False (Dataset B)
 shading = False
 
 # Load confusion matrix (from gridsearch)
@@ -61,10 +60,12 @@ cm_SVM = load_object_from_file("Grid-search_CM_SVM.pk1",
 cm_NN = load_object_from_file("Grid-search_CM_NN.pk1",
                               to_file="NN", shading=shading)
 
-
-
-
 plot_aggregated_confusion_matrix(cm_LR, cm_DT, cm_RF, cm_SVM, cm_NN,
                                  title="Confusion Matrix Dataset B",to_file="FINAL",
                                  show_plot=True)
+
+#%% Big tables!
+
+
+
 
