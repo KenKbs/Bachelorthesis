@@ -12,9 +12,11 @@ from Scripts.util import load_object_from_file
 import os
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.ticker import MaxNLocator
 import pandas as pd
 import numpy as np
 import itertools
+from Scripts.util import get_filepath
 
 
 shading = True
@@ -40,9 +42,7 @@ def plot_aggregated_confusion_matrix(cm_LR, cm_DT, cm_RF, cm_SVM, cm_NN,
                           target_names=None,
                           to_file=False,
                           show_plot=False,
-                          shading=True,
                           title='Confusion matrix',
-                          cmap=None,
                           normalize=True):
     """
     given a sklearn confusion matrix (cm) or dataframe, make a nice plot
@@ -65,16 +65,7 @@ def plot_aggregated_confusion_matrix(cm_LR, cm_DT, cm_RF, cm_SVM, cm_NN,
                   Shows plot if True.
                   OPTIONAL Default = False
 
-    shading:  Bool
-                  If True, saved into subdirectory with shading included folder
-                  If False: Case = shading excluded. Save results there
-                  OPTIONAL Defaullt = True
-
     title:        the text to display at the top of the matrix
-
-    cmap:         the gradient of the values displayed from matplotlib.pyplot.cm
-                  see http://matplotlib.org/examples/color/colormaps_reference.html
-                  plt.get_cmap('jet') or plt.cm.Blues
 
     normalize:    If False, plot the raw numbers
                   If True, plot the proportions
@@ -117,9 +108,7 @@ def plot_aggregated_confusion_matrix(cm_LR, cm_DT, cm_RF, cm_SVM, cm_NN,
     light_cmap = LinearSegmentedColormap.from_list("light_cmap", colors_cmap)
     
     # Custom cmap
-    if cmap is None:
-        # cmap = plt.get_cmap('Blues')
-        cmap = light_cmap
+    cmap = light_cmap
 
     # Normalize to percentage values
     if normalize:
@@ -134,11 +123,11 @@ def plot_aggregated_confusion_matrix(cm_LR, cm_DT, cm_RF, cm_SVM, cm_NN,
 
     # Normalize std. deviation for heat mapping
     norm_std_dev = (std_dev - np.min(std_dev)) / (np.max(std_dev) - np.min(std_dev))
-
+    
     # Plot the heatmap
     plt.figure(figsize=(10, 8))
     plt.imshow(norm_std_dev, interpolation='nearest', cmap=cmap, alpha=1)
-    plt.title(title)
+    plt.title(title,fontsize=17)
     
     #Adjusting & plotting the color bar
     ax = plt.gca()
@@ -185,7 +174,12 @@ def plot_aggregated_confusion_matrix(cm_LR, cm_DT, cm_RF, cm_SVM, cm_NN,
             plt.text(j, i + 0.2, "{:,}".format(cm_NN[i, j]),
                      horizontalalignment="center",
                      color="blue")
-
+    
+    # Set x and y axis ticks to integers only (for shading=False)
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    # ax.set_yticks(np.arange(len(target_names)))
+    
     # Adjust axis
     plt.tight_layout()
     plt.ylabel('True label')
@@ -209,11 +203,12 @@ def plot_aggregated_confusion_matrix(cm_LR, cm_DT, cm_RF, cm_SVM, cm_NN,
 
     # If filepath = str
     if isinstance(to_file, str):
-        file_path = get_filepath(model_sd=to_file, shading=shading)
+        file_path = get_filepath(model_sd=to_file, shading=None)
         # Save confusion Matrix to File as PDF
         file_path = os.path.join(file_path, f'{title}.pdf')
         fig.savefig(file_path, format="pdf", bbox_inches='tight', pad_inches=0.1)  # bbox_inches for not cutting off labels!
 
 
-plot_confusion_matrix2(cm_LR, cm_DT, cm_RF, cm_SVM, cm_NN)
-    
+plot_aggregated_confusion_matrix(cm_LR, cm_DT, cm_RF, cm_SVM, cm_NN,to_file="FINAL",
+                                 title="Confusion Matrix Dataset A")
+
