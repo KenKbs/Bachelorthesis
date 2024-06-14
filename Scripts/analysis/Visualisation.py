@@ -137,16 +137,16 @@ metrics_NN=extract_metrics(report_NN, accuracy_NN_T, "NN")
 metrics_data=[metrics_LR,metrics_DT,metrics_RF,metrics_SVM,metrics_NN]
 
 #Create new dataframe
-metrics_df = pd.DataFrame(metrics_data)
+metrics_df_T = pd.DataFrame(metrics_data)
 
 #Express weighted scores as difference to macro scores
-metrics_df["Weighted Avg Precision"]=metrics_df["Weighted Avg Precision"]- metrics_df["Macro Avg Precision"]
-metrics_df["Weighted Avg Recall"]=metrics_df["Weighted Avg Recall"]- metrics_df["Macro Avg Recall"]
-metrics_df["Weighted Avg F1-Score"]=metrics_df["Weighted Avg F1-Score"]- metrics_df["Macro Avg F1-Score"]
+metrics_df_T["Weighted Avg Precision"]=metrics_df_T["Weighted Avg Precision"]- metrics_df_T["Macro Avg Precision"]
+metrics_df_T["Weighted Avg Recall"]=metrics_df_T["Weighted Avg Recall"]- metrics_df_T["Macro Avg Recall"]
+metrics_df_T["Weighted Avg F1-Score"]=metrics_df_T["Weighted Avg F1-Score"]- metrics_df_T["Macro Avg F1-Score"]
 
 #*100 for percentage values and round to two values after decimal point
-metrics_df.iloc[:, 1:] = metrics_df.iloc[:, 1:] * 100
-metrics_df.iloc[:,1:]=metrics_df.iloc[:,1:].round(2)
+metrics_df_T.iloc[:, 1:] = metrics_df_T.iloc[:, 1:] * 100
+metrics_df_T.iloc[:,1:]=metrics_df_T.iloc[:,1:].round(2)
 
 #shading False (Dataset B)
 
