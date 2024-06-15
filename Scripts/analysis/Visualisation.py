@@ -10,7 +10,8 @@ Created on Sat May 25 23:48:26 2024
 # Imports
 from Scripts.util import (load_object_from_file,
                           plot_aggregated_confusion_matrix,
-                          write_output_to_csv)
+                          write_output_to_csv,
+                          calculate_accuracy)
 
 import os
 import pandas as pd
@@ -37,10 +38,7 @@ def extract_metrics(report,accuracy,model_name):
     }
     return metrics
 
-def calculate_accuracy(cm):
-    cm=cm.values
-    accuracy = np.trace(cm) / np.sum(cm).astype('float')
-    return accuracy
+
 
 def run_visualization(shading=True):
     pass
@@ -76,7 +74,7 @@ plot_aggregated_confusion_matrix(cm_LR, cm_DT, cm_RF, cm_SVM, cm_NN,
                                  title=file_name,to_file="FINAL",
                                  show_plot=False)
 
-# Calculate each single accuracy (for later)
+# Calculate each single accuracy of all runs (for later)
 accuracy_LR = calculate_accuracy(cm_LR)
 accuracy_DT = calculate_accuracy(cm_DT)
 accuracy_RF = calculate_accuracy(cm_RF)

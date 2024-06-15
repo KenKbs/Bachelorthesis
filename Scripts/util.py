@@ -363,15 +363,29 @@ def get_confusion_matrix(y_test,y_pred,normalize=None):
     
     #Return ConfusionMatrix
     return cm
-    
 
-def manipulate_confusion_matrix():
-    #maybe a good thing dunno
-    pass
 
-def extract_class_weights(dataframe):
-    #maybe
-    pass
+def calculate_accuracy(cm):
+    """
+    Takes a Confusion matrix Dataframe and returns the accuracy
+    First convertes it to numpy and then calculates the 
+    total correct classifications
+
+    Parameters
+    ----------
+    cm : DataFrame
+        Confusion Matrix Dataframe
+
+    Returns
+    -------
+    accuracy : Float
+        Accuracy of model.
+        
+    """
+    cm=cm.values
+    accuracy = np.trace(cm) / np.sum(cm).astype('float')
+    return accuracy
+
 
 #%% Print out, Display, write to file
 def generate_table(data1, data2=None,data1_name='data1',data2_name='data2'):

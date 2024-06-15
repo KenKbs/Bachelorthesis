@@ -59,7 +59,7 @@ def run_LR_traintest(shading=True,num_iterations=100):
     data=filter_data(raw_data,filter_value=100,shading=shading)
     
     #Print out fault distribution before and after filtering
-        #Include shading cases
+    #Include shading cases
     if shading:
         generate_table(raw_data,data,"Raw","Filtered")
     #Exclude shading casees
@@ -77,6 +77,8 @@ def run_LR_traintest(shading=True,num_iterations=100):
     #load confusion matrix (from gridserach)
     cm_all=load_object_from_file("Grid-search_CM_LR.pk1",
                                          to_file="LR",shading=shading)
+    
+    
     
     
     #%%Initialize csv-file
