@@ -9,7 +9,8 @@ Created on Sat May 25 23:48:26 2024
     
 # Imports
 from Scripts.util import (load_object_from_file,
-                          plot_aggregated_confusion_matrix)
+                          plot_aggregated_confusion_matrix,
+                          write_output_to_csv)
 
 import os
 import pandas as pd
@@ -41,10 +42,19 @@ def calculate_accuracy(cm):
     accuracy = np.trace(cm) / np.sum(cm).astype('float')
     return accuracy
 
+def run_visualization(shading=True):
+    pass
+
 #%%Plot Confusion Matrix
 
 # Shading True (Dataset A)
-shading = True
+shading = False #PUT INTO FUNCTION LATER!!!
+
+#Define Filename
+if shading:
+    file_name="Confusion Matrix Dataset A"
+else:
+    file_name="Confusion Matrix Dataset B"
 
 # Load confusion matrix (from gridsearch)
 cm_LR = load_object_from_file("TestTrain_CM_LR.pk1",
@@ -63,17 +73,17 @@ cm_NN = load_object_from_file("TestTrain_CM_NN.pk1",
                               to_file="NN", shading=shading)
 
 plot_aggregated_confusion_matrix(cm_LR, cm_DT, cm_RF, cm_SVM, cm_NN,
-                                 title="Confusion Matrix Dataset A",to_file="FINAL",
-                                 show_plot=True)
+                                 title=file_name,to_file="FINAL",
+                                 show_plot=False)
 
 # Calculate each single accuracy (for later)
-accuracy_LR_T = calculate_accuracy(cm_LR)
-accuracy_DT_T = calculate_accuracy(cm_DT)
-accuracy_RF_T = calculate_accuracy(cm_RF)
-accuracy_SVM_T = calculate_accuracy(cm_SVM)
-accuracy_NN_T = calculate_accuracy(cm_NN)
+accuracy_LR = calculate_accuracy(cm_LR)
+accuracy_DT = calculate_accuracy(cm_DT)
+accuracy_RF = calculate_accuracy(cm_RF)
+accuracy_SVM = calculate_accuracy(cm_SVM)
+accuracy_NN = calculate_accuracy(cm_NN)
 
-
+"""
 ## Shading False (Dataset B)
 shading = False
 
@@ -94,7 +104,7 @@ cm_NN = load_object_from_file("TestTrain_CM_NN.pk1",
                               to_file="NN", shading=shading)
 
 plot_aggregated_confusion_matrix(cm_LR, cm_DT, cm_RF, cm_SVM, cm_NN,
-                                 title="Confusion Matrix Dataset B",to_file="FINAL",
+                                 title=file_name,to_file="FINAL",
                                  show_plot=True)
 
 # Calculate each single accuracy (for later)
@@ -103,12 +113,9 @@ accuracy_DT_F = calculate_accuracy(cm_DT)
 accuracy_RF_F = calculate_accuracy(cm_RF)
 accuracy_SVM_F = calculate_accuracy(cm_SVM)
 accuracy_NN_F = calculate_accuracy(cm_NN)
-
+"""
 
 #%% Big tables!
-
-# shading True (Dataset A)
-shading = True
 
 #load in reports
 report_LR = load_object_from_file("TestTrain_report_LR.pk1",
@@ -127,26 +134,36 @@ report_NN = load_object_from_file("TestTrain_report_NN.pk1",
                                    to_file="NN",shading=shading)
 
 #extract metrics
-metrics_LR=extract_metrics(report_LR,accuracy_LR_T, "LR")
-metrics_DT=extract_metrics(report_DT,accuracy_DT_T, "DT")
-metrics_RF=extract_metrics(report_RF,accuracy_RF_T, "RF")
-metrics_SVM=extract_metrics(report_SVM,accuracy_SVM_T, "SVM")
-metrics_NN=extract_metrics(report_NN, accuracy_NN_T, "NN")
+metrics_LR=extract_metrics(report_LR,accuracy_LR, "LR")
+metrics_DT=extract_metrics(report_DT,accuracy_DT, "DT")
+metrics_RF=extract_metrics(report_RF,accuracy_RF, "RF")
+metrics_SVM=extract_metrics(report_SVM,accuracy_SVM, "SVM")
+metrics_NN=extract_metrics(report_NN, accuracy_NN, "NN")
 
 #Combine data
 metrics_data=[metrics_LR,metrics_DT,metrics_RF,metrics_SVM,metrics_NN]
 
 #Create new dataframe
-metrics_df_T = pd.DataFrame(metrics_data)
+metrics_df = pd.DataFrame(metrics_data)
 
 #Express weighted scores as difference to macro scores
-metrics_df_T["Weighted Avg Precision"]=metrics_df_T["Weighted Avg Precision"]- metrics_df_T["Macro Avg Precision"]
-metrics_df_T["Weighted Avg Recall"]=metrics_df_T["Weighted Avg Recall"]- metrics_df_T["Macro Avg Recall"]
-metrics_df_T["Weighted Avg F1-Score"]=metrics_df_T["Weighted Avg F1-Score"]- metrics_df_T["Macro Avg F1-Score"]
+metrics_df["Weighted Avg Precision"]=metrics_df["Weighted Avg Precision"]- metrics_df["Macro Avg Precision"]
+metrics_df["Weighted Avg Recall"]=metrics_df["Weighted Avg Recall"]- metrics_df["Macro Avg Recall"]
+metrics_df["Weighted Avg F1-Score"]=metrics_df["Weighted Avg F1-Score"]- metrics_df["Macro Avg F1-Score"]
 
 #*100 for percentage values and round to two values after decimal point
-metrics_df_T.iloc[:, 1:] = metrics_df_T.iloc[:, 1:] * 100
-metrics_df_T.iloc[:,1:]=metrics_df_T.iloc[:,1:].round(2)
+metrics_df.iloc[:, 1:] = metrics_df.iloc[:, 1:] * 100
+metrics_df.iloc[:,1:]=metrics_df.iloc[:,1:].round(2)
+
+#Define File-name
+if shading:
+    file_name ="Metrics Dataset A"    
+else:
+    file_name ="Metrics Dataset B"
+
+#write to csv
+write_output_to_csv(metrics_df,file_name=file_name,to_file="FINAL",shading=None)
+
 
 #shading False (Dataset B)
 
