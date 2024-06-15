@@ -325,9 +325,9 @@ tuple_list = [] #store names of combinations
 avg_accuracy_tuple_list=[] #stores tuples with mean accuracy of combination
 sample_A_list = [] #store first np array 
 sample_B_list = [] #store second np array
-t_statistics_A_list =[] #store t-statistics
-p_value_A_list =[] #store p-value
-significant_A_list=[] #yes/no
+t_statistics_list =[] #store t-statistics
+p_value_list =[] #store p-value
+significant_list=[] #yes/no
 
 # Iterate over combinationsA to populate lists
 for list_index, item in enumerate(combinations_A):
@@ -341,15 +341,15 @@ for list_index, item in enumerate(combinations_A):
 #Perform t-tests on sample_A_list and sample_B_list to populate t_statistics and p_value
 for i in range(len(sample_A_list)):
     t_stat, p_value = ttest_ind(sample_A_list[i], sample_B_list[i]) #perform t-test over A and B
-    t_statistics_A_list.append(t_stat)
-    p_value_A_list.append(p_value)
+    t_statistics_list.append(t_stat)
+    p_value_list.append(p_value)
     print(f"Independent t-test: t-statistic = {t_stat:.3f}, p-value = {p_value:.3f}")
 
     # Interpretation a=5%
     if p_value < 0.05:
-        significant_A_list.append("yes")
+        significant_list.append("yes")
     else:
-        significant_A_list.append("no")
+        significant_list.append("no")
 
 #Create a dictonary with lists to construct the df
 dictonary_A = {
@@ -358,9 +358,9 @@ dictonary_A = {
     'avg_accuracy':avg_accuracy_tuple_list,
     'sample_A': sample_A_list,
     'sample_B': sample_B_list,
-    't_statistics':t_statistics_A_list,
-    'p_value':p_value_A_list,
-    'significant 5%':significant_A_list
+    't_statistics':t_statistics_list,
+    'p_value':p_value_list,
+    'significant 5%':significant_list
 }
 
 #Construct DF
@@ -377,5 +377,120 @@ write_output_to_csv(df_ttest_A,file_name="ttest-A",to_file="FINAL",shading=None)
 
 
 #COMBINATIONS B
+
+#Again, Create empty list from which DF is constructed later!
+index_list = [] #store index of list
+tuple_list = [] #store names of combinations
+avg_accuracy_tuple_list=[] #stores tuples with mean accuracy of combination
+sample_A_list = [] #store first np array 
+sample_B_list = [] #store second np array
+t_statistics_list =[] #store t-statistics
+p_value_list =[] #store p-value
+significant_list=[] #yes/no
+
+# Iterate over combinationsB to populate lists
+for list_index, item in enumerate(combinations_B):
+    index_list.append(list_index)
+    tuple_list.append((item[0][1], item[1][1]))  # Tuple with NAME of combination
+    avg_accuracy_tuple_list.append((np.mean(item[0][0]),np.mean(item[1][0]))) #tuple (avg. accuracy sample A, avg. accuracy sample B)
+    sample_A_list.append(item[0][0])  # NP array of first Tuple (sample A)
+    sample_B_list.append(item[1][0])  # NP array of second Tuple (sample B)
+    
+    
+#Perform t-tests on sample_A_list and sample_B_list to populate t_statistics and p_value
+for i in range(len(sample_A_list)):
+    t_stat, p_value = ttest_ind(sample_A_list[i], sample_B_list[i]) #perform t-test over A and B
+    t_statistics_list.append(t_stat)
+    p_value_list.append(p_value)
+    print(f"Independent t-test: t-statistic = {t_stat:.3f}, p-value = {p_value:.3f}")
+
+    # Interpretation a=5%
+    if p_value < 0.05:
+        significant_list.append("yes")
+    else:
+        significant_list.append("no")
+
+#Create a dictonary with lists to construct the df
+dictonary_B = {
+    'list_index': index_list,
+    'combination': tuple_list,
+    'avg_accuracy':avg_accuracy_tuple_list,
+    'sample_A': sample_A_list,
+    'sample_B': sample_B_list,
+    't_statistics':t_statistics_list,
+    'p_value':p_value_list,
+    'significant 5%':significant_list
+}
+
+#Construct DF
+df_ttest_B=pd.DataFrame(dictonary_B)
+
+#Pickle DF
+save_object_to_file(df_ttest_B, file_name="ttest-B",to_file="FINAL",shading=None)
+
+#Drop sample_A, sample_B columns for saving to csv (else it's too long)
+df_ttest_B=df_ttest_B.drop(columns=["sample_A","sample_B"])
+
+#Write to csv
+write_output_to_csv(df_ttest_B,file_name="ttest-B",to_file="FINAL",shading=None)
+
+
+#COMBINATIONS SAME
+
+#Create empty lists again
+index_list = [] #store index of list
+tuple_list = [] #store names of combinations
+avg_accuracy_tuple_list=[] #stores tuples with mean accuracy of combination
+sample_A_list = [] #store first np array 
+sample_B_list = [] #store second np array
+t_statistics_list =[] #store t-statistics
+p_value_list =[] #store p-value
+significant_list=[] #yes/no
+
+# Iterate over combinations_SAME to populate lists
+for list_index, item in enumerate(combinations_SAME):
+    index_list.append(list_index)
+    tuple_list.append((item[0][1], item[1][1]))  # Tuple with NAME of combination
+    avg_accuracy_tuple_list.append((np.mean(item[0][0]),np.mean(item[1][0]))) #tuple (avg. accuracy sample A, avg. accuracy sample B)
+    sample_A_list.append(item[0][0])  # NP array of first Tuple (sample A)
+    sample_B_list.append(item[1][0])  # NP array of second Tuple (sample B)
+    
+    
+#Perform t-tests on sample_A_list and sample_B_list to populate t_statistics and p_value
+for i in range(len(sample_A_list)):
+    t_stat, p_value = ttest_ind(sample_A_list[i], sample_B_list[i]) #perform t-test over A and B
+    t_statistics_list.append(t_stat)
+    p_value_list.append(p_value)
+    print(f"Independent t-test: t-statistic = {t_stat:.3f}, p-value = {p_value:.3f}")
+
+    # Interpretation a=5%
+    if p_value < 0.05:
+        significant_list.append("yes")
+    else:
+        significant_list.append("no")
+
+#Create a dictonary with lists to construct the df
+dictonary_SAME = {
+    'list_index': index_list,
+    'combination': tuple_list,
+    'avg_accuracy':avg_accuracy_tuple_list,
+    'sample_A': sample_A_list,
+    'sample_B': sample_B_list,
+    't_statistics':t_statistics_list,
+    'p_value':p_value_list,
+    'significant 5%':significant_list
+}
+
+#Construct DF
+df_ttest_SAME=pd.DataFrame(dictonary_SAME)
+
+#Pickle DF
+save_object_to_file(df_ttest_SAME, file_name="ttest-SAME",to_file="FINAL",shading=None)
+
+#Drop sample_A, sample_B columns for saving to csv (else it's too long)
+df_ttest_SAME=df_ttest_SAME.drop(columns=["sample_A","sample_B"])
+
+#Write to csv
+write_output_to_csv(df_ttest_SAME,file_name="ttest-SAME",to_file="FINAL",shading=None)
 
 
