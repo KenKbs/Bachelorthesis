@@ -14,6 +14,7 @@ from Scripts.util import (
     train_test_split_data,
     load_object_from_file,
     get_performance_metrics,
+    calculate_accuracy,
     get_confusion_matrix,
     plot_confusion_matrix,
     write_output_to_csv,
@@ -78,8 +79,8 @@ def run_LR_traintest(shading=True,num_iterations=100):
     cm_all=load_object_from_file("Grid-search_CM_LR.pk1",
                                          to_file="LR",shading=shading)
     
-    
-    
+    #calculate accuracy
+    accuracy = calculate_accuracy(cm_all)    
     
     #%%Initialize csv-file
     #Manipulate report_all to prepare for writing to csv:
@@ -90,14 +91,20 @@ def run_LR_traintest(shading=True,num_iterations=100):
     #Get train_time from GridSerach
     train_time_GS=get_GS_traintime(to_file="LR", shading=shading)
     
-    # Add train-time of Gridsearch for best-model
+    # Add train-time (value) of Gridsearch for best-model
     single_row=np.append(single_row,train_time_GS)    
+    
+    # Add accuracy (value) of Gridsearch for best-model
+    single_row=np.append(single_row,accuracy)
     
     #Create custom row labels based on index and column names first four = iterable index last two = index name of df
     row_labels=convert_to_srow(report_all,'run_counter',extract_labels=True)
     
     #Append fit-time to row_labels
     row_labels=np.append(row_labels,"train or test time in seconds")
+    
+    #Append Accuracy to row_labels
+    row_labels=np.append(row_labels,"accuracy")
     
     #Get file_path
     parent_file_path=get_filepath(model_sd="LR",shading=shading)
@@ -143,6 +150,9 @@ def run_LR_traintest(shading=True,num_iterations=100):
             #Get f1,recall,precision etc.as DF
             report_tt=get_performance_metrics(y_test, y_pred)
             
+            #Get Accuracy as Single value
+            accuracy=get_performance_metrics(y_test, y_pred,only_accuracy=True)
+            
             #Get confusion Matrix as DF
             cm_tt=get_confusion_matrix(y_test, y_pred,normalize=False)
             
@@ -151,6 +161,9 @@ def run_LR_traintest(shading=True,num_iterations=100):
             
             #Append training time
             single_row=np.append(single_row,train_time_sec)
+            
+            #Append accuracy
+            single_row=np.append(single_row,accuracy)
             
             #Write results of this run to csv
             file.write(';'.join(map(str,single_row))+'\n')

@@ -40,8 +40,8 @@ if __name__ == "__main__":
     # RF.run_RF_gridsearch(shading=False)
     
     #Support Vector Machine
-    SVM.run_SVM_gridsearch(shading=True)
-    SVM.run_SVM_gridsearch(shading=False)
+    # SVM.run_SVM_gridsearch(shading=True)
+    # SVM.run_SVM_gridsearch(shading=False)
     
     #Neural Network
     # NN.run_NN_gridsearch(shading=True)
@@ -51,24 +51,24 @@ if __name__ == "__main__":
     #%%Run Test-split repeaditly
     
     #Logistic Regression
-    # TTLR.run_LR_traintest(shading=True,num_iterations=100)
-    # TTLR.run_LR_traintest(shading=False,num_iterations=100)
+    TTLR.run_LR_traintest(shading=True,num_iterations=100)
+    TTLR.run_LR_traintest(shading=False,num_iterations=100)
     
     #Decsion Tree
-    # TTDT.run_DT_traintest(shading=True,num_iterations=100)
-    # TTDT.run_DT_traintest(shading=False,num_iterations=100)
+    TTDT.run_DT_traintest(shading=True,num_iterations=100)
+    TTDT.run_DT_traintest(shading=False,num_iterations=100)
     
-    #Random Forest
-    # TTRF.run_RF_traintest(shading=True,num_iterations=100)
-    # TTRF.run_RF_traintest(shading=False,num_iterations=100)
+    # #Random Forest
+    TTRF.run_RF_traintest(shading=True,num_iterations=100)
+    TTRF.run_RF_traintest(shading=False,num_iterations=100)
     
-    #Support Vector Machine
+    # #Support Vector Machine
     TTSVM.run_SVM_traintest(shading=True,num_iterations=100)
     TTSVM.run_SVM_traintest(shading=False,num_iterations=100)
     
     #Neural Network
-    # TTNN.run_NN_traintest(shading=True,num_iterations=100)
-    # TTNN.run_NN_traintest(shading=False,num_iterations=100)
+    TTNN.run_NN_traintest(shading=True,num_iterations=100)
+    TTNN.run_NN_traintest(shading=False,num_iterations=100)
     
         
     #%%DOT export 
