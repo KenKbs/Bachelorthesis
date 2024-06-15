@@ -9,9 +9,12 @@ Created on Sat May 25 23:48:26 2024
     
 # Imports
 from Scripts.util import (load_object_from_file,
+                          get_filepath,
                           plot_aggregated_confusion_matrix,
                           write_output_to_csv,
                           calculate_accuracy)
+
+from scipy.stats import ttest_ind
 
 import os
 import pandas as pd
@@ -46,7 +49,7 @@ def run_visualization(shading=True):
 #%%Plot Confusion Matrix
 
 # Shading True (Dataset A)
-shading = False #PUT INTO FUNCTION LATER!!!
+shading = True #PUT INTO FUNCTION LATER!!!
 
 #Define Filename
 if shading:
@@ -163,6 +166,180 @@ else:
 write_output_to_csv(metrics_df,file_name=file_name,to_file="FINAL",shading=None)
 
 
-#shading False (Dataset B)
+#%% Statistical tests
+
+def run_t_tests():
+    pass
+
+#read-in data
+
+shading=True
+#LR
+file_path=get_filepath(model_sd="LR",shading=shading)
+file_path+=r"\Test-train-results_LR.csv"
+tt_results_LR = pd.read_csv(file_path,sep=";")
+
+#DT
+file_path=get_filepath(model_sd="DT",shading=shading)
+file_path+=r"\Test-train-results_DT.csv"
+tt_results_DT = pd.read_csv(file_path,sep=";")
+
+#RF
+file_path=get_filepath(model_sd="RF",shading=shading)
+file_path+=r"\Test-train-results_RF.csv"
+tt_results_RF = pd.read_csv(file_path,sep=";")
+
+#SVM
+file_path=get_filepath(model_sd="SVM",shading=shading)
+file_path+=r"\Test-train-results_SVM.csv"
+tt_results_SVM = pd.read_csv(file_path,sep=";")
+
+#NN
+file_path=get_filepath(model_sd="NN",shading=shading)
+file_path+=r"\Test-train-results_NN.csv"
+tt_results_NN = pd.read_csv(file_path,sep=";")
 
 
+#Extract Accuracy values and calculate mean values for Dataset A
+c_to_ext="recall_weighted avg"
+
+acc_LR_A=tt_results_LR[c_to_ext].values
+mean_LR_A=np.mean(acc_LR_A)
+
+acc_DT_A=tt_results_DT[c_to_ext].values
+mean_DT_A=np.mean(acc_DT_A)
+
+acc_RF_A=tt_results_RF[c_to_ext].values
+mean_RF_A=np.mean(acc_RF_A)
+
+acc_SVM_A=tt_results_SVM[c_to_ext].values
+mean_SVM_A=np.mean(acc_SVM_A)
+
+acc_NN_A=tt_results_NN[c_to_ext].values
+mean_NN_A=np.mean(acc_NN_A)
+
+
+shading = False
+file_path=get_filepath(model_sd="LR",shading=shading)
+file_path+=r"\Test-train-results_LR.csv"
+tt_results_LR = pd.read_csv(file_path,sep=";")
+
+#DT
+file_path=get_filepath(model_sd="DT",shading=shading)
+file_path+=r"\Test-train-results_DT.csv"
+tt_results_DT = pd.read_csv(file_path,sep=";")
+
+#RF
+file_path=get_filepath(model_sd="RF",shading=shading)
+file_path+=r"\Test-train-results_RF.csv"
+tt_results_RF = pd.read_csv(file_path,sep=";")
+
+#SVM
+file_path=get_filepath(model_sd="SVM",shading=shading)
+file_path+=r"\Test-train-results_SVM.csv"
+tt_results_SVM = pd.read_csv(file_path,sep=";")
+
+#NN
+file_path=get_filepath(model_sd="NN",shading=shading)
+file_path+=r"\Test-train-results_NN.csv"
+tt_results_NN = pd.read_csv(file_path,sep=";")
+
+#Extract accuracy values for dataset B
+acc_LR_B=tt_results_LR[c_to_ext].values
+mean_LR_B=np.mean(acc_LR_B)
+
+acc_DT_B=tt_results_DT[c_to_ext].values
+mean_DT_B=np.mean(acc_DT_B)
+
+acc_RF_B=tt_results_RF[c_to_ext].values
+mean_RF_B=np.mean(acc_RF_B)
+
+acc_SVM_B=tt_results_SVM[c_to_ext].values
+mean_SVM_B=np.mean(acc_SVM_B)
+
+acc_NN_B=tt_results_NN[c_to_ext].values
+mean_NN_B=np.mean(acc_NN_B)
+
+
+#Generating possible combinations
+
+#Dataset A
+acc_datasetA=[acc_LR_A, 
+              acc_DT_A,
+              acc_RF_A,
+              acc_SVM_A,
+              acc_NN_A]
+
+acc_datasetA_names=["acc_LR_A", 
+                    "acc_DT_A",
+                    "acc_RF_A",
+                    "acc_SVM_A",
+                    "acc_NN_A"]
+
+combinations_A = list(itertools.combinations(zip(acc_datasetA, acc_datasetA_names), 2))
+
+#Dataset B
+acc_datasetB=[acc_LR_B, 
+              acc_DT_B,
+              acc_RF_B,
+              acc_SVM_B,
+              acc_NN_B]
+
+acc_datasetB_names=["acc_LR_B", 
+                    "acc_DT_B",
+                    "acc_RF_B",
+                    "acc_SVM_B",
+                    "acc_NN_B"]
+
+combinations_B = list(itertools.combinations(zip(acc_datasetB,acc_datasetB_names), 2))
+
+print(combinations_A[0][0][1])
+print(combinations_A[0][1][1])
+
+"""
+combinations is a nested list where each item contains a tuple and where each 
+value of the tuple is again a tuple
+combinations [0-9][0/1][0/1] first indicates list index second indicates if first
+or second sample is accessed, third indicates if name [1] or actual np.array [0]
+is accessed
+"""
+# for index,item in enumerate(combinations_A):
+#     print(f'index = {index}\nitem0 = {item[0][1]}\nitem1={item[1][1]}')
+    
+#Create a new dataframe with the right values 
+#First create empty list where DF is constructed later!
+index_list = []
+tuple_list = []
+sample_A_list = []
+sample_B_list = []
+
+# Iterate over combinationsA to populate lists
+for list_index, item in enumerate(combinations_A):
+    index_list.append(list_index)
+    tuple_list.append((item[0][1], item[1][1]))  # Tuple with NAME of combination
+    sample_A_list.append(item[0][0])  # NP array of first Tuple (sample A)
+    sample_B_list.append(item[1][0])  # NP array of second Tuple (sample B)
+    
+#Create a dictonary with lists to construct the df
+
+dictonary_A = {
+    'list_index': index_list,
+    'combination': tuple_list,
+    'sample_A': sample_A_list,
+    'sample_B': sample_B_list
+}
+
+
+df_data_A=pd.DataFrame(dictonary_A)
+
+
+#Perform one t-test
+
+t_stat, p_value = ttest_ind(sample_A_list[0], sample_B_list[0])
+print(f"Independent t-test: t-statistic = {t_stat:.3f}, p-value = {p_value:.3f}")
+
+# Interpretation
+if p_value < 0.05:
+    print("There is a significant difference between the accuracy scores of the two models.")
+else:
+    print("There is no significant difference between the accuracy scores of the two models.")
