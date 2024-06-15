@@ -12,7 +12,8 @@ from Scripts.util import (load_object_from_file,
                           get_filepath,
                           plot_aggregated_confusion_matrix,
                           write_output_to_csv,
-                          calculate_accuracy)
+                          calculate_accuracy,
+                          save_object_to_file)
 
 from scipy.stats import ttest_ind
 
@@ -171,7 +172,7 @@ write_output_to_csv(metrics_df,file_name=file_name,to_file="FINAL",shading=None)
 def run_t_tests():
     pass
 
-#read-in data
+#read-in data for dataset A (shading = True)
 
 shading=True
 #LR
@@ -200,26 +201,29 @@ file_path+=r"\Test-train-results_NN.csv"
 tt_results_NN = pd.read_csv(file_path,sep=";")
 
 
-#Extract Accuracy values and calculate mean values for Dataset A
+#Extract Accuracy values for Dataset A
 c_to_ext="recall_weighted avg"
 
 acc_LR_A=tt_results_LR[c_to_ext].values
-mean_LR_A=np.mean(acc_LR_A)
+# mean_LR_A=np.mean(acc_LR_A)
 
 acc_DT_A=tt_results_DT[c_to_ext].values
-mean_DT_A=np.mean(acc_DT_A)
+# mean_DT_A=np.mean(acc_DT_A)
 
 acc_RF_A=tt_results_RF[c_to_ext].values
-mean_RF_A=np.mean(acc_RF_A)
+# mean_RF_A=np.mean(acc_RF_A)
 
 acc_SVM_A=tt_results_SVM[c_to_ext].values
-mean_SVM_A=np.mean(acc_SVM_A)
+# mean_SVM_A=np.mean(acc_SVM_A)
 
 acc_NN_A=tt_results_NN[c_to_ext].values
-mean_NN_A=np.mean(acc_NN_A)
+# mean_NN_A=np.mean(acc_NN_A)
 
 
+#read in data for Dataset B (shading = False)
 shading = False
+
+#LR
 file_path=get_filepath(model_sd="LR",shading=shading)
 file_path+=r"\Test-train-results_LR.csv"
 tt_results_LR = pd.read_csv(file_path,sep=";")
@@ -244,41 +248,43 @@ file_path=get_filepath(model_sd="NN",shading=shading)
 file_path+=r"\Test-train-results_NN.csv"
 tt_results_NN = pd.read_csv(file_path,sep=";")
 
-#Extract accuracy values for dataset B
+#Extract accuracy values (np arrays) for dataset B
 acc_LR_B=tt_results_LR[c_to_ext].values
-mean_LR_B=np.mean(acc_LR_B)
+# mean_LR_B=np.mean(acc_LR_B)
 
 acc_DT_B=tt_results_DT[c_to_ext].values
-mean_DT_B=np.mean(acc_DT_B)
+# mean_DT_B=np.mean(acc_DT_B)
 
 acc_RF_B=tt_results_RF[c_to_ext].values
-mean_RF_B=np.mean(acc_RF_B)
+# mean_RF_B=np.mean(acc_RF_B)
 
 acc_SVM_B=tt_results_SVM[c_to_ext].values
-mean_SVM_B=np.mean(acc_SVM_B)
+# mean_SVM_B=np.mean(acc_SVM_B)
 
 acc_NN_B=tt_results_NN[c_to_ext].values
-mean_NN_B=np.mean(acc_NN_B)
+# mean_NN_B=np.mean(acc_NN_B)
 
 
-#Generating possible combinations
+#Generating possible combinations for t-tests
 
-#Dataset A
+#put Dataset A accuracy arrays into a list
 acc_datasetA=[acc_LR_A, 
               acc_DT_A,
               acc_RF_A,
               acc_SVM_A,
               acc_NN_A]
 
+#create a list with names
 acc_datasetA_names=["acc_LR_A", 
                     "acc_DT_A",
                     "acc_RF_A",
                     "acc_SVM_A",
                     "acc_NN_A"]
 
+#create all combinations of models for Dataset A
 combinations_A = list(itertools.combinations(zip(acc_datasetA, acc_datasetA_names), 2))
 
-#Dataset B
+#Same for Dataset B
 acc_datasetB=[acc_LR_B, 
               acc_DT_B,
               acc_RF_B,
@@ -291,10 +297,13 @@ acc_datasetB_names=["acc_LR_B",
                     "acc_SVM_B",
                     "acc_NN_B"]
 
+#Create all combinations of models for Dataset B
 combinations_B = list(itertools.combinations(zip(acc_datasetB,acc_datasetB_names), 2))
 
-print(combinations_A[0][0][1])
-print(combinations_A[0][1][1])
+
+#Create combinations with same model (LR_A,LR_B), same structure as combinations_A,_B List! (therefore double zipped)
+combinations_SAME=list(zip(zip(acc_datasetA,acc_datasetA_names),zip(acc_datasetB,acc_datasetB_names)))
+
 
 """
 combinations is a nested list where each item contains a tuple and where each 
@@ -302,44 +311,71 @@ value of the tuple is again a tuple
 combinations [0-9][0/1][0/1] first indicates list index second indicates if first
 or second sample is accessed, third indicates if name [1] or actual np.array [0]
 is accessed
+print(combinations_A[0][0][1])
+print(combinations_A[0][1][1])
 """
-# for index,item in enumerate(combinations_A):
-#     print(f'index = {index}\nitem0 = {item[0][1]}\nitem1={item[1][1]}')
     
-#Create a new dataframe with the right values 
-#First create empty list where DF is constructed later!
-index_list = []
-tuple_list = []
-sample_A_list = []
-sample_B_list = []
+#%%Create a new dataframe which contains necessary information (t-test values etc.)
+
+#COMBINATIONS_A
+
+#First create empty list from which DF is constructed later!
+index_list = [] #store index of list
+tuple_list = [] #store names of combinations
+avg_accuracy_tuple_list=[] #stores tuples with mean accuracy of combination
+sample_A_list = [] #store first np array 
+sample_B_list = [] #store second np array
+t_statistics_A_list =[] #store t-statistics
+p_value_A_list =[] #store p-value
+significant_A_list=[] #yes/no
 
 # Iterate over combinationsA to populate lists
 for list_index, item in enumerate(combinations_A):
     index_list.append(list_index)
     tuple_list.append((item[0][1], item[1][1]))  # Tuple with NAME of combination
+    avg_accuracy_tuple_list.append((np.mean(item[0][0]),np.mean(item[1][0]))) #tuple (avg. accuracy sample A, avg. accuracy sample B)
     sample_A_list.append(item[0][0])  # NP array of first Tuple (sample A)
     sample_B_list.append(item[1][0])  # NP array of second Tuple (sample B)
     
-#Create a dictonary with lists to construct the df
+    
+#Perform t-tests on sample_A_list and sample_B_list to populate t_statistics and p_value
+for i in range(len(sample_A_list)):
+    t_stat, p_value = ttest_ind(sample_A_list[i], sample_B_list[i]) #perform t-test over A and B
+    t_statistics_A_list.append(t_stat)
+    p_value_A_list.append(p_value)
+    print(f"Independent t-test: t-statistic = {t_stat:.3f}, p-value = {p_value:.3f}")
 
+    # Interpretation a=5%
+    if p_value < 0.05:
+        significant_A_list.append("yes")
+    else:
+        significant_A_list.append("no")
+
+#Create a dictonary with lists to construct the df
 dictonary_A = {
     'list_index': index_list,
     'combination': tuple_list,
+    'avg_accuracy':avg_accuracy_tuple_list,
     'sample_A': sample_A_list,
-    'sample_B': sample_B_list
+    'sample_B': sample_B_list,
+    't_statistics':t_statistics_A_list,
+    'p_value':p_value_A_list,
+    'significant 5%':significant_A_list
 }
 
+#Construct DF
+df_ttest_A=pd.DataFrame(dictonary_A)
 
-df_data_A=pd.DataFrame(dictonary_A)
+#Pickle DF
+save_object_to_file(df_ttest_A, file_name="ttest-A",to_file="FINAL",shading=None)
+
+#Drop sample_A, sample_B columns for saving to csv (else it's too long)
+df_ttest_A=df_ttest_A.drop(columns=["sample_A","sample_B"])
+
+#Write to csv
+write_output_to_csv(df_ttest_A,file_name="ttest-A",to_file="FINAL",shading=None)
 
 
-#Perform one t-test
+#COMBINATIONS B
 
-t_stat, p_value = ttest_ind(sample_A_list[0], sample_B_list[0])
-print(f"Independent t-test: t-statistic = {t_stat:.3f}, p-value = {p_value:.3f}")
 
-# Interpretation
-if p_value < 0.05:
-    print("There is a significant difference between the accuracy scores of the two models.")
-else:
-    print("There is no significant difference between the accuracy scores of the two models.")
