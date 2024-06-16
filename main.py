@@ -22,6 +22,9 @@ if __name__ == "__main__":
     import Scripts.traintest.SupportVectorMachinett as TTSVM
     import Scripts.traintest.NeuralNetworktt as TTNN
     
+    #Analysis Imports
+    import Scripts.analysis.Visualisation as VS
+    
         
     #%%Run Gridsearch
     
@@ -51,25 +54,30 @@ if __name__ == "__main__":
     #%%Run Test-split repeaditly
     
     #Logistic Regression
-    TTLR.run_LR_traintest(shading=True,num_iterations=100)
-    TTLR.run_LR_traintest(shading=False,num_iterations=100)
+    # TTLR.run_LR_traintest(shading=True,num_iterations=100)
+    # TTLR.run_LR_traintest(shading=False,num_iterations=100)
     
     #Decsion Tree
-    TTDT.run_DT_traintest(shading=True,num_iterations=100)
-    TTDT.run_DT_traintest(shading=False,num_iterations=100)
+    # TTDT.run_DT_traintest(shading=True,num_iterations=100)
+    # TTDT.run_DT_traintest(shading=False,num_iterations=100)
     
     # #Random Forest
-    TTRF.run_RF_traintest(shading=True,num_iterations=100)
-    TTRF.run_RF_traintest(shading=False,num_iterations=100)
+    # TTRF.run_RF_traintest(shading=True,num_iterations=100)
+    # TTRF.run_RF_traintest(shading=False,num_iterations=100)
     
     # #Support Vector Machine
-    TTSVM.run_SVM_traintest(shading=True,num_iterations=100)
-    TTSVM.run_SVM_traintest(shading=False,num_iterations=100)
+    # TTSVM.run_SVM_traintest(shading=True,num_iterations=100)
+    # TTSVM.run_SVM_traintest(shading=False,num_iterations=100)
     
     #Neural Network
-    TTNN.run_NN_traintest(shading=True,num_iterations=100)
-    TTNN.run_NN_traintest(shading=False,num_iterations=100)
+    # TTNN.run_NN_traintest(shading=True,num_iterations=100)
+    # TTNN.run_NN_traintest(shading=False,num_iterations=100)
     
+    #%% Analysis
+    VS.plot_cmANDcreate_metrics(shading=True)
+    VS.plot_cmANDcreate_metrics(shading=False)
+    
+    VS.run_t_testsANDplot_training_time()
         
     #%%DOT export 
     #if render with graphviz failed (for DT and RF)
