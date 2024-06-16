@@ -13,7 +13,8 @@ from Scripts.util import (load_object_from_file,
                           plot_aggregated_confusion_matrix,
                           write_output_to_csv,
                           calculate_accuracy,
-                          save_object_to_file)
+                          save_object_to_file,
+                          plot_training_time)
 
 from scipy.stats import ttest_ind
 
@@ -21,6 +22,7 @@ import os
 import pandas as pd
 import numpy as np
 import itertools
+import matplotlib.pyplot as plt
 
 def extract_metrics(report,accuracy,model_name):
     macro_avg_precision = report.loc['macro avg', 'precision']
@@ -169,7 +171,7 @@ write_output_to_csv(metrics_df,file_name=file_name,to_file="FINAL",shading=None)
 
 #%% Statistical tests
 
-def run_t_tests():
+def run_t_testsANDplot_training_time():
     pass
 
 #read-in data for dataset A (shading = True)
@@ -205,19 +207,19 @@ tt_results_NN = pd.read_csv(file_path,sep=";")
 c_to_ext="recall_weighted avg"
 
 acc_LR_A=tt_results_LR[c_to_ext].values
-# mean_LR_A=np.mean(acc_LR_A)
-
 acc_DT_A=tt_results_DT[c_to_ext].values
-# mean_DT_A=np.mean(acc_DT_A)
-
 acc_RF_A=tt_results_RF[c_to_ext].values
-# mean_RF_A=np.mean(acc_RF_A)
-
 acc_SVM_A=tt_results_SVM[c_to_ext].values
-# mean_SVM_A=np.mean(acc_SVM_A)
-
 acc_NN_A=tt_results_NN[c_to_ext].values
-# mean_NN_A=np.mean(acc_NN_A)
+
+
+#Extract training times
+time_LR_A=tt_results_LR["train or test time in seconds"].values
+time_DT_A=tt_results_DT["train or test time in seconds"].values
+time_RF_A=tt_results_RF["train or test time in seconds"].values
+time_SVM_A=tt_results_SVM["train or test time in seconds"].values
+time_NN_A=tt_results_NN["train or test time in seconds"].values
+
 
 
 #read in data for Dataset B (shading = False)
@@ -250,19 +252,17 @@ tt_results_NN = pd.read_csv(file_path,sep=";")
 
 #Extract accuracy values (np arrays) for dataset B
 acc_LR_B=tt_results_LR[c_to_ext].values
-# mean_LR_B=np.mean(acc_LR_B)
-
 acc_DT_B=tt_results_DT[c_to_ext].values
-# mean_DT_B=np.mean(acc_DT_B)
-
 acc_RF_B=tt_results_RF[c_to_ext].values
-# mean_RF_B=np.mean(acc_RF_B)
-
 acc_SVM_B=tt_results_SVM[c_to_ext].values
-# mean_SVM_B=np.mean(acc_SVM_B)
-
 acc_NN_B=tt_results_NN[c_to_ext].values
-# mean_NN_B=np.mean(acc_NN_B)
+
+#Extract training times for dataset B
+time_LR_B=tt_results_LR["train or test time in seconds"].values
+time_DT_B=tt_results_DT["train or test time in seconds"].values
+time_RF_B=tt_results_RF["train or test time in seconds"].values
+time_SVM_B=tt_results_SVM["train or test time in seconds"].values
+time_NN_B=tt_results_NN["train or test time in seconds"].values
 
 
 #Generating possible combinations for t-tests
@@ -315,9 +315,10 @@ print(combinations_A[0][0][1])
 print(combinations_A[0][1][1])
 """
     
-#%%Create a new dataframe which contains necessary information (t-test values etc.)
 
-#COMBINATIONS_A
+
+#%%COMBINATIONS_A
+#Create a new dataframes which contain necessary information (t-test values etc.)
 
 #First create empty list from which DF is constructed later!
 index_list = [] #store index of list
@@ -376,7 +377,7 @@ df_ttest_A=df_ttest_A.drop(columns=["sample_A","sample_B"])
 write_output_to_csv(df_ttest_A,file_name="ttest-A",to_file="FINAL",shading=None)
 
 
-#COMBINATIONS B
+#%%COMBINATIONS B
 
 #Again, Create empty list from which DF is constructed later!
 index_list = [] #store index of list
@@ -435,7 +436,7 @@ df_ttest_B=df_ttest_B.drop(columns=["sample_A","sample_B"])
 write_output_to_csv(df_ttest_B,file_name="ttest-B",to_file="FINAL",shading=None)
 
 
-#COMBINATIONS SAME
+#%%COMBINATIONS SAME
 
 #Create empty lists again
 index_list = [] #store index of list
@@ -492,5 +493,46 @@ df_ttest_SAME=df_ttest_SAME.drop(columns=["sample_A","sample_B"])
 
 #Write to csv
 write_output_to_csv(df_ttest_SAME,file_name="ttest-SAME",to_file="FINAL",shading=None)
+
+"""
+Not really elegant coding, would make it more pretty if more time...
+"""
+
+
+#%% Plot training time
+
+#calculate mean training times
+#dataset A
+mean_time_LR_A=np.mean(time_LR_A)
+mean_time_DT_A=np.mean(time_DT_A)
+mean_time_RF_A=np.mean(time_RF_A)
+mean_time_SVM_A=np.mean(time_SVM_A)
+mean_time_NN_A=np.mean(time_NN_A)
+
+#dataset B
+mean_time_LR_B=np.mean(time_LR_B)
+mean_time_DT_B=np.mean(time_DT_B)
+mean_time_RF_B=np.mean(time_RF_B)
+mean_time_SVM_B=np.mean(time_SVM_B)
+mean_time_NN_B=np.mean(time_NN_B)
+
+
+#Create lists with names and mean training time
+model_names=["LR","DT","RF","SVM","NN"]
+
+mean_time_A_list=[mean_time_LR_A,mean_time_DT_A, 
+                  mean_time_RF_A, mean_time_SVM_A, 
+                  mean_time_NN_A]
+
+mean_time_B_list=[mean_time_LR_B,mean_time_DT_B, 
+                  mean_time_RF_B, mean_time_SVM_B, 
+                  mean_time_NN_B]
+
+#Plot training time
+
+plot_training_time(mean_time_A_list, mean_time_B_list, model_names,
+                   show_plot=False,to_file="FINAL")
+
+
 
 

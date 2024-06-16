@@ -905,6 +905,63 @@ def plot_aggregated_confusion_matrix(cm_LR, cm_DT, cm_RF, cm_SVM, cm_NN,
         fig.savefig(file_path, format="png", bbox_inches='tight', pad_inches=0.1,dpi=600)  # bbox_inches for not cutting off labels!
 
 
+def plot_training_time(mean_time_A_list,mean_time_B_list,model_names,
+                       show_plot=False,to_file=None):
+    """
+    takes average training times and creates a plot and saves it to to_file
+    directory if given.
+
+    Parameters
+    ----------
+    mean_time_A_list : list
+        mean training times for dataset A.
+    mean_time_B_list : list
+        mean training times for dataset B.
+    model_names : list
+        strings of model names for x-label
+    show_plot : bool, optional
+        If True, shows the plot. The default is False.
+    to_file : Str, optional
+        Specifiy subdirectory to safe to. The default is None.
+
+    Returns
+    -------
+    None.
+
+    """
+    #Create the plot
+    plt.figure(figsize=(8,6))
+
+    #Plot training times for A
+    plt.plot(model_names,mean_time_A_list,marker="o",linestyle="-",
+             linewidth=2,markersize=6,color='blue',label="Dataset A")
+
+    #Plot training times for B
+    plt.plot(model_names,mean_time_B_list,marker="o",linestyle="-",
+             linewidth=2,markersize=6,color='red',label="Dataset B")
+
+    #Add Titel and labels
+    plt.title('Training times for Dataset A and Dataset B',fontsize=14)
+    plt.xlabel('ML Model',fontsize=11)
+    plt.ylabel('Average training time in seconds',fontsize=11)
+
+    plt.legend(loc="best",fontsize=10)
+    # plt.legend.get_frame().set_edgecolor('black')
+
+    plt.grid(True,linestyle="--",linewidth=0.7,alpha=0.7)
+
+    if show_plot:
+        plt.show()
+        
+    # Get current figure for saving to filepath later
+    fig = plt.gcf()
+    
+    # If filepath = str
+    if isinstance(to_file, str):
+        file_path = get_filepath(model_sd=to_file, shading=None)
+        # Save confusion Matrix to File as PDF
+        file_path = os.path.join(file_path, 'Training times.png')
+        fig.savefig(file_path, format="png", bbox_inches='tight', pad_inches=0.1,dpi=600)  # bbox_inches for not cutting off labels!
 
 
 def plot_histogram (df,title="Histogram"):
