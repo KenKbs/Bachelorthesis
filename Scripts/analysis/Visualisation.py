@@ -529,7 +529,6 @@ mean_time_B_list=[mean_time_LR_B,mean_time_DT_B,
                   mean_time_NN_B]
 
 #Plot training time
-
 plot_training_time(mean_time_A_list, mean_time_B_list, model_names,
                    show_plot=False,to_file="FINAL")
 

@@ -828,7 +828,8 @@ def plot_aggregated_confusion_matrix(cm_LR, cm_DT, cm_RF, cm_SVM, cm_NN,
     #Adjusting & plotting the color bar
     ax = plt.gca()
     cbar_ax = ax.inset_axes([1.05, 0, 0.03, 0.8])
-    plt.colorbar(cax=cbar_ax)
+    colorbar=plt.colorbar(cax=cbar_ax)
+    colorbar.set_label("Normalized Std. Deviation")
 
     # Custom target names
     if target_names is not None:
