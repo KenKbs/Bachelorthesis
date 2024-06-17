@@ -1,17 +1,17 @@
 index;precision;recall;f1-score;support
-0.0;0.9995;0.9998;0.9996;6185100.0
-1.0;0.9984;0.9957;0.997;120000.0
-2.0;0.9914;0.9822;0.9867;207400.0
-3.0;0.996;0.9996;0.9978;120500.0
-macro avg;0.9963;0.9943;0.9953;6633000.0
-weighted avg;0.9992;0.9992;0.9992;6633000.0
+0.0;0.9994;0.9998;0.9996;6185100.0
+1.0;0.9986;0.9957;0.9971;120000.0
+2.0;0.9917;0.9805;0.9858;207400.0
+3.0;0.9959;1.0;0.9979;120500.0
+macro avg;0.9964;0.994;0.9951;6633000.0
+weighted avg;0.9991;0.9991;0.9991;6633000.0
 
  
 ;0;1;2;3
-0;6183841;3;1249;7
-1;38;119486;475;1
-2;3037;189;203701;473
-3;0;1;44;120455
+0;6183855;0;1240;5
+1;43;119478;471;8
+2;3391;167;203358;484
+3;0;2;0;120498
 
  
 activation;alpha;batch_size;beta_1;beta_2;early_stopping;epsilon;hidden_layer_sizes;learning_rate;learning_rate_init;max_fun;max_iter;momentum;n_iter_no_change;nesterovs_momentum;power_t;random_state;shuffle;solver;tol;validation_fraction;verbose;warm_start

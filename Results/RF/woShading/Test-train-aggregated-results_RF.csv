@@ -1,17 +1,17 @@
 index;precision;recall;f1-score;support
 0.0;0.9999;1.0;1.0;6185100.0
-1.0;0.9994;0.9986;0.999;120000.0
-2.0;0.9978;0.9976;0.9977;207400.0
-3.0;0.9989;0.9993;0.9991;120500.0
+1.0;0.9994;0.9983;0.9989;120000.0
+2.0;0.9979;0.9977;0.9978;207400.0
+3.0;0.9986;0.9996;0.9991;120500.0
 macro avg;0.999;0.9989;0.9989;6633000.0
-weighted avg;0.9998;0.9998;0.9998;6633000.0
+weighted avg;0.9999;0.9999;0.9999;6633000.0
 
  
 ;0;1;2;3
-0;6184840;1;259;0
-1;55;119835;110;0
-2;284;77;206906;133
-3;0;0;83;120417
+0;6184853;3;244;0
+1;68;119795;137;0
+2;253;66;206917;164
+3;0;0;53;120447
 
  
 bootstrap;ccp_alpha;class_weight;criterion;max_depth;max_features;max_leaf_nodes;max_samples;min_impurity_decrease;min_samples_leaf;min_samples_split;min_weight_fraction_leaf;monotonic_cst;n_estimators;n_jobs;oob_score;random_state;verbose;warm_start
