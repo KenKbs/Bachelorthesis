@@ -533,3 +533,29 @@ def run_t_testsANDplot_training_time():
     print("Training time sucessfully plotted and saved to Results/FINAL \n")
     
 
+
+#%% MANUELLE ÜBERPRÜFUNG --> stimmt alles :))
+"""
+import math
+
+A=acc_DT_A
+B=acc_NN_A
+
+sigmaA=np.var(A)
+sigmaB=np.var(B)
+
+meanA=np.mean(A)
+meanB=np.mean(B)
+
+
+sigma=(1/(100+100-2))*((99*sigmaA)+99*sigmaB)
+
+T_value=(meanA-meanB)/math.sqrt(sigma*(1/100+1/100))
+
+print(f"sigma:{sigma} and T-value:{T_value}")
+
+print(f"meanA: {meanA}   meanB: {meanB}")
+
+#Highly significant because of extremly small variances!
+"""
+
