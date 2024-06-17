@@ -23,7 +23,7 @@ from scipy.stats import ttest_ind
 
 
 #Internal function
-def __extract_metrics(report,accuracy,model_name):
+def _extract_metrics(report,accuracy,model_name):
     macro_avg_precision = report.loc['macro avg', 'precision']
     weighted_avg_precision = report.loc['weighted avg', 'precision']
     macro_avg_recall = report.loc['macro avg', 'recall']
@@ -133,11 +133,11 @@ def plot_cmANDcreate_metrics(shading=True):
                                        to_file="NN",shading=shading)
     
     #extract metrics
-    metrics_LR=extract_metrics(report_LR,accuracy_LR, "LR")
-    metrics_DT=extract_metrics(report_DT,accuracy_DT, "DT")
-    metrics_RF=extract_metrics(report_RF,accuracy_RF, "RF")
-    metrics_SVM=extract_metrics(report_SVM,accuracy_SVM, "SVM")
-    metrics_NN=extract_metrics(report_NN, accuracy_NN, "NN")
+    metrics_LR=_extract_metrics(report_LR,accuracy_LR, "LR")
+    metrics_DT=_extract_metrics(report_DT,accuracy_DT, "DT")
+    metrics_RF=_extract_metrics(report_RF,accuracy_RF, "RF")
+    metrics_SVM=_extract_metrics(report_SVM,accuracy_SVM, "SVM")
+    metrics_NN=_extract_metrics(report_NN, accuracy_NN, "NN")
     
     #Combine data
     metrics_data=[metrics_LR,metrics_DT,metrics_RF,metrics_SVM,metrics_NN]
@@ -199,7 +199,7 @@ def run_t_testsANDplot_training_time():
     
     
     #Extract Accuracy values for Dataset A
-    c_to_ext="recall_weighted avg"
+    c_to_ext="accuracy"
     
     acc_LR_A=tt_results_LR[c_to_ext].values
     acc_DT_A=tt_results_DT[c_to_ext].values
@@ -493,6 +493,8 @@ def run_t_testsANDplot_training_time():
     Not really elegant coding, would make it more pretty if more time...
     """
     
+    print("All t-tests sucessfully conducted, saved csv to Results/FINAL \n")
+    
     
     #%% Plot training time
     
@@ -527,8 +529,7 @@ def run_t_testsANDplot_training_time():
     plot_training_time(mean_time_A_list, mean_time_B_list, model_names,
                        show_plot=False,to_file="FINAL")
     
-    print("All t-tests sucessfully conducted, saved csv to Results/FINAL \n")
-    
+   
     print("Training time sucessfully plotted and saved to Results/FINAL \n")
     
 
