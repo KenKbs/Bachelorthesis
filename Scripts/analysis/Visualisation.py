@@ -559,3 +559,26 @@ print(f"meanA: {meanA}   meanB: {meanB}")
 #Highly significant because of extremly small variances!
 """
 
+#%% Plot Herm like picture
+import matplotlib.pyplot as plt
+
+# Define the models and their corresponding performance and explainability values
+models = ['Deep Neural Networks', 'Ensembles', 'Support Vector Machines', 'Decision Trees', 'Linear Regressions']
+performance = [5, 4, 3, 2, 1]  # Modify these values to change the performance
+explainability = [1, 2, 3, 4, 5]  # Keeping explainability fixed for illustration
+
+# Plotting the data
+plt.figure(figsize=(8, 6))
+plt.scatter(explainability, performance, s=100, color='black')
+
+# Annotating the points
+for i, model in enumerate(models):
+    plt.annotate(model, (explainability[i], performance[i]), textcoords="offset points", xytext=(0,10), ha='center')
+
+# Adding labels and title
+plt.xlabel('Explainability')
+plt.ylabel('Performance')
+plt.title('Performance vs. Explainability')
+plt.grid(False)
+plt.show()
+
