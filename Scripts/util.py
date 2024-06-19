@@ -943,7 +943,7 @@ def plot_training_time(mean_time_A_list,mean_time_B_list,model_names,
 
     #Add Titel and labels
     plt.title('Training times for Dataset A and Dataset B',fontsize=14)
-    plt.xlabel('ML Model',fontsize=11)
+    plt.xlabel('ML model',fontsize=11)
     plt.ylabel('Average training time in seconds',fontsize=11)
 
     plt.legend(loc="best",fontsize=10)
