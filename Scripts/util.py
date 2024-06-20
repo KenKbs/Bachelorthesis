@@ -1040,11 +1040,11 @@ def plot_herm_like_figure(performance,show_plot=True,to_file=None):
 
     # Adding labels, adjusting axis and title
     ax.set_xlabel('Explainability')
-    ax.set_ylabel('Performance\n(Average accuracy in %)')
+    ax.set_ylabel('Performance\nAverage accuracy in %')
     ylim_low=98.5
     ax.set_ylim(ylim_low, 100.2)
     ax.set_xlim(0.5, 4.5)
-    ax.set_title('Performance vs. Explainability')
+    ax.set_title('Performance vs. Explainability',fontsize=17)
     ax.grid(False)
 
     # Remove top and right spines (borders, clean plot)
