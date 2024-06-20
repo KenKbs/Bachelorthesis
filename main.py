@@ -77,7 +77,7 @@ if __name__ == "__main__":
     VS.plot_cmANDcreate_metrics(shading=True)
     VS.plot_cmANDcreate_metrics(shading=False)
     
-    VS.run_t_testsANDplot_training_time()
+    VS.run_t_testsANDcreate_visualisations()
         
     #%%DOT export 
     #if render with graphviz failed (for DT and RF)

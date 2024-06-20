@@ -998,6 +998,85 @@ def plot_histogram (df,title="Histogram"):
     return plt
 
 
+def plot_herm_like_figure(performance,show_plot=True,to_file=None):
+    """
+    Creates a Herm-like plot for performance vs explainability
+    LR is omitted, as not suitable for prediction
+
+    Parameters
+    ----------
+    performance : List
+        List of ONLY FOUR VALUES.
+        [NN,RF,SVM,DT] DIFFERENT ORDERING!
+    show_plot : Bool, optional
+        Shows plot if True. The default is True.
+    to_file : String, optional
+        specify subdirectory, were to save to. 
+        If no string given no saving is done.
+        The default is None.
+
+    Returns
+    -------
+    None.
+
+    """    
+    # Define names and explainability
+    models = ['Neural\nNetworks', 'Random\nForest', 'Support Vector\nMachines', 'Decision Trees']
+    # performance = [98.82, 99.72, 99.83, 99.59]  # Modify these values to change the performance
+    explainability = [1, 2, 3, 4]  # Keeping explainability fixed as no other values available, later study? ;))
+
+    # Create figure and axis
+    fig, ax = plt.subplots(figsize=(8, 6))
+
+    # Plotting the data
+    ax.scatter(explainability, performance, s=100, color='black')
+
+    # Annotating the points
+    for i, model in enumerate(models):
+        if i == 2:
+            ax.annotate(model, (explainability[i], performance[i]), textcoords="offset points", xytext=(0, 15), ha='center')
+        else:
+            ax.annotate(model, (explainability[i], performance[i]), textcoords="offset points", xytext=(0, 10), ha='center')
+
+    # Adding labels, adjusting axis and title
+    ax.set_xlabel('Explainability')
+    ax.set_ylabel('Performance\n(Average accuracy in %)')
+    ylim_low=98.5
+    ax.set_ylim(ylim_low, 100.2)
+    ax.set_xlim(0.5, 4.5)
+    ax.set_title('Performance vs. Explainability')
+    ax.grid(False)
+
+    # Remove top and right spines (borders, clean plot)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    #set y-lab ticks
+    ax.set_yticks([98,98.5,99,99.5,100])
+
+    #set x-lab ticks
+    ax.set_xticklabels([])
+    ax.xaxis.set_ticks([])
+
+    #Draw arrrows
+    #x-arrow
+    ax.plot(1, ylim_low-0.5, ">k", transform=ax.get_yaxis_transform(), clip_on=False)
+
+    #y-arrow
+    ax.plot(0.5, 1, "^k", transform=ax.get_xaxis_transform(), clip_on=False)
+
+    # show plot
+    if show_plot:
+        plt.show()
+    
+    #save to filepath
+    if isinstance(to_file, str):
+        file_path = get_filepath(model_sd=to_file, shading=None)
+        # Save confusion Matrix to File as PDF
+        file_path = os.path.join(file_path, 'Performance vs Explainability Herm-like.png')
+        fig.savefig(file_path, format="png", bbox_inches='tight', pad_inches=0.1,dpi=600)  # bbox_inches for not cutting off labels!
+
+
 def plot_from_dot_file (file_name,file_path=None,to_file=False,shading=None,
                         output_filename=None,vector_export=True, png_export=False): 
     """
