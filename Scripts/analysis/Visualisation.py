@@ -559,26 +559,53 @@ print(f"meanA: {meanA}   meanB: {meanB}")
 #Highly significant because of extremly small variances!
 """
 
-#%% Plot Herm like picture
-import matplotlib.pyplot as plt
 
+#%% Plot herm-like figure
+
+import matplotlib.pyplot as plt
 # Define the models and their corresponding performance and explainability values
-models = ['Deep Neural Networks', 'Ensembles', 'Support Vector Machines', 'Decision Trees', 'Linear Regressions']
-performance = [5, 4, 3, 2, 1]  # Modify these values to change the performance
-explainability = [1, 2, 3, 4, 5]  # Keeping explainability fixed for illustration
+models = ['Neural\nNetworks', 'Random\nForest', 'Support Vector\nMachines', 'Decision Trees']
+performance = [98.82, 99.72, 99.83, 99.59]  # Modify these values to change the performance
+explainability = [1, 2, 3, 4]  # Keeping explainability fixed for illustration
+
+# Create figure and axis
+fig, ax = plt.subplots(figsize=(8, 6))
 
 # Plotting the data
-plt.figure(figsize=(8, 6))
-plt.scatter(explainability, performance, s=100, color='black')
+ax.scatter(explainability, performance, s=100, color='black')
 
 # Annotating the points
 for i, model in enumerate(models):
-    plt.annotate(model, (explainability[i], performance[i]), textcoords="offset points", xytext=(0,10), ha='center')
+    if i == 2:
+        ax.annotate(model, (explainability[i], performance[i]), textcoords="offset points", xytext=(0, 15), ha='center')
+    else:
+        ax.annotate(model, (explainability[i], performance[i]), textcoords="offset points", xytext=(0, 10), ha='center')
 
-# Adding labels and title
-plt.xlabel('Explainability')
-plt.ylabel('Performance')
-plt.title('Performance vs. Explainability')
-plt.grid(False)
+# Adding labels, adjusting axis and title
+ax.set_xlabel('Explainability')
+ax.set_ylabel('Performance\n(Average accuracy in %)')
+ylim_low=98.5
+ax.set_ylim(ylim_low, 100.2)
+ax.set_xlim(0.5, 4.5)
+ax.set_title('Performance vs. Explainability')
+ax.grid(False)
+
+# Remove top and right spines
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+
+#set y-lab ticks
+ax.set_yticks([98,98.5,99,99.5,100])
+
+#set x-lab ticks
+ax.set_xticklabels([])
+ax.xaxis.set_ticks([])
+
+#Draw arrrows
+#x-arrow
+ax.plot(1, ylim_low-0.5, ">k", transform=ax.get_yaxis_transform(), clip_on=False)
+
+#y-arrow
+ax.plot(0.5, 1, "^k", transform=ax.get_xaxis_transform(), clip_on=False)
+
 plt.show()
-
