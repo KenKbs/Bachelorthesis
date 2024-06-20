@@ -538,10 +538,11 @@ def run_t_testsANDcreate_visualisations():
     
     #Create list with avg. accuracy values
     #!Different ordering! Orderd according to Herm LR excluded as not useable for PV detection.
-    performance_list=[np.mean(acc_NN_A),
-                      np.mean(acc_RF_A),
-                      np.mean(acc_SVM_A),
-                      np.mean(acc_DT_A)]
+    performance_list=[np.mean(acc_NN_A)*100,
+                      np.mean(acc_RF_A)*100,
+                      np.mean(acc_SVM_A)*100,
+                      np.mean(acc_DT_A)*100]
+    #*100 to create %-values! so 99.58 etc.
     
     plot_herm_like_figure(performance_list,show_plot=False,to_file="FINAL")
     
