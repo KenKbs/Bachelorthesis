@@ -22,8 +22,8 @@ The repository is structured as follows:
 
 ## Requirements
 For all code, Python version 3.11.8 has been used. As no docker or other virtualisation method was utilized, the conda environment is provided. 
-- the [environment.yml](environment.yml) file can be used to set up the conda environment
-    - clone the repository and create the conda environment:
+- the [environment.yml](environment.yml) file can be used to set up the conda environment.
+    clone the repository and create the conda environment:
   
               conda env create --name envname --file environment.yml
 - the [package_conda.txt](package_conda.txt) lists all modules used. The package graphviz is optional, as there are generally problems with the installation.
