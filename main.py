@@ -1,6 +1,7 @@
 """
 Main-Script to run, main entry point!
-
+IDE Spyder
+@author: Kenny Kubsch
 """
 
 if __name__ == "__main__":  
@@ -29,49 +30,49 @@ if __name__ == "__main__":
     #%%Run Gridsearch
     
     #Logistic Regression
-    # GLR.run_LR_gridsearch(shading=True)
-    # GLR.run_LR_gridsearch(shading=False)
+    GLR.run_LR_gridsearch(shading=True)
+    GLR.run_LR_gridsearch(shading=False)
         
     #Decision Tree
-    # DT.overfit_DT(shading=True,runs=100)
-    # DT.overfit_DT(shading=False,runs=100)
-    # DT.run_DT_gridsearch(shading=True)
-    # DT.run_DT_gridsearch(shading=False)
+    DT.overfit_DT(shading=True,runs=100)
+    DT.overfit_DT(shading=False,runs=100)
+    DT.run_DT_gridsearch(shading=True)
+    DT.run_DT_gridsearch(shading=False)
     
     #Random Forest    
-    # RF.run_RF_gridsearch(shading=True)
-    # RF.run_RF_gridsearch(shading=False)
+    RF.run_RF_gridsearch(shading=True)
+    RF.run_RF_gridsearch(shading=False)
     
     #Support Vector Machine
-    # SVM.run_SVM_gridsearch(shading=True)
-    # SVM.run_SVM_gridsearch(shading=False)
+    SVM.run_SVM_gridsearch(shading=True)
+    SVM.run_SVM_gridsearch(shading=False)
     
     #Neural Network
-    # NN.run_NN_gridsearch(shading=True)
-    # NN.run_NN_gridsearch(shading=False)
+    NN.run_NN_gridsearch(shading=True)
+    NN.run_NN_gridsearch(shading=False)
 
 
     #%%Run Test-split repeaditly
     
     #Logistic Regression
-    # TTLR.run_LR_traintest(shading=True,num_iterations=100)
-    # TTLR.run_LR_traintest(shading=False,num_iterations=100)
+    TTLR.run_LR_traintest(shading=True,num_iterations=100)
+    TTLR.run_LR_traintest(shading=False,num_iterations=100)
     
     #Decsion Tree
-    # TTDT.run_DT_traintest(shading=True,num_iterations=100)
-    # TTDT.run_DT_traintest(shading=False,num_iterations=100)
+    TTDT.run_DT_traintest(shading=True,num_iterations=100)
+    TTDT.run_DT_traintest(shading=False,num_iterations=100)
     
     # #Random Forest
-    # TTRF.run_RF_traintest(shading=True,num_iterations=100)
-    # TTRF.run_RF_traintest(shading=False,num_iterations=100)
+    TTRF.run_RF_traintest(shading=True,num_iterations=100)
+    TTRF.run_RF_traintest(shading=False,num_iterations=100)
     
     # #Support Vector Machine
-    # TTSVM.run_SVM_traintest(shading=True,num_iterations=100)
-    # TTSVM.run_SVM_traintest(shading=False,num_iterations=100)
+    TTSVM.run_SVM_traintest(shading=True,num_iterations=100)
+    TTSVM.run_SVM_traintest(shading=False,num_iterations=100)
     
     #Neural Network
-    # TTNN.run_NN_traintest(shading=True,num_iterations=100)
-    # TTNN.run_NN_traintest(shading=False,num_iterations=100)
+    TTNN.run_NN_traintest(shading=True,num_iterations=100)
+    TTNN.run_NN_traintest(shading=False,num_iterations=100)
     
     #%% Analysis
     VS.plot_cmANDcreate_metrics(shading=True)
